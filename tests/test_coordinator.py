@@ -16,7 +16,12 @@ async def test_coordinator_update_success(hass):
     """Test successful coordinator update."""
     client = MagicMock()
     client.async_check_health = AsyncMock(
-        return_value={"status": "ok", "version": "1.0.0", "reachable": True, "latency_ms": 12.3}
+        return_value={
+            "status": "ok",
+            "version": "1.0.0",
+            "reachable": True,
+            "latency_ms": 12.3,
+        }
     )
     client.async_get_health_detailed = AsyncMock(
         return_value={
@@ -34,7 +39,9 @@ async def test_coordinator_update_success(hass):
         }
     )
     client.async_get_models = AsyncMock(return_value=["hermes-agent"])
-    client.async_get_sessions = AsyncMock(return_value=[{"id": "sess_1"}, {"id": "sess_2"}])
+    client.async_get_sessions = AsyncMock(
+        return_value=[{"id": "sess_1"}, {"id": "sess_2"}]
+    )
     client.async_get_jobs = AsyncMock(return_value=[{"id": "job_1"}])
     client.async_get_skills = AsyncMock(return_value=[{"id": "skill_1"}])
 

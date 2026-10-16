@@ -44,7 +44,9 @@ async def async_setup_entry(
     async_add_entities([HermesAgentAITaskEntity(entry, client, coordinator)])
 
 
-class HermesAgentAITaskEntity(CoordinatorEntity[HermesAgentDataUpdateCoordinator], Entity):
+class HermesAgentAITaskEntity(
+    CoordinatorEntity[HermesAgentDataUpdateCoordinator], Entity
+):
     """Hermes Agent AI Task entity for smart home reasoning and generative workflows."""
 
     _attr_has_entity_name = True
@@ -74,7 +76,8 @@ class HermesAgentAITaskEntity(CoordinatorEntity[HermesAgentDataUpdateCoordinator
             from homeassistant.components.ai_task import AITaskEntityFeature
 
             self._attr_supported_features = (
-                AITaskEntityFeature.GENERATE_DATA | AITaskEntityFeature.SUPPORT_ATTACHMENTS
+                AITaskEntityFeature.GENERATE_DATA
+                | AITaskEntityFeature.SUPPORT_ATTACHMENTS
             )
         except (ImportError, AttributeError):
             self._attr_supported_features = 5

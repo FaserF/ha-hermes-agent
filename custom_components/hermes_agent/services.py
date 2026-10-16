@@ -133,7 +133,9 @@ def _get_entry_context(
     entry = entries[0]
     entry_data = hass.data.get(DOMAIN, {}).get(entry.entry_id, {})
     client: HermesAgentClient | None = entry_data.get(DATA_CLIENT)
-    coordinator: HermesAgentDataUpdateCoordinator | None = entry_data.get(DATA_COORDINATOR)
+    coordinator: HermesAgentDataUpdateCoordinator | None = entry_data.get(
+        DATA_COORDINATOR
+    )
 
     if not client or not coordinator:
         raise HomeAssistantError("Hermes Agent client or coordinator not initialized")
@@ -227,7 +229,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
         client, coordinator, entry, _ = _get_entry_context(hass)
         title = call.data.get("title")
         prompt = call.data.get("prompt")
-        model = call.data.get("model", entry.options.get(CONF_CHAT_MODEL, DEFAULT_CHAT_MODEL))
+        model = call.data.get(
+            "model", entry.options.get(CONF_CHAT_MODEL, DEFAULT_CHAT_MODEL)
+        )
 
         try:
             session_data = await client.async_create_session(title=title)
@@ -243,7 +247,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         except Exception as err:
             _LOGGER.error("Failed to create session with Hermes Agent: %s", err)
-            raise HomeAssistantError(f"Hermes Agent create_session error: {err}") from err
+            raise HomeAssistantError(
+                f"Hermes Agent create_session error: {err}"
+            ) from err
 
     async def _handle_refresh_status(call: ServiceCall) -> ServiceResponse:
         """Force refresh of Hermes Agent status and telemetry."""
@@ -362,7 +368,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         except Exception as err:
             _LOGGER.error("Failed to suggest automations: %s", err)
-            raise HomeAssistantError(f"Hermes Agent suggest_automations error: {err}") from err
+            raise HomeAssistantError(
+                f"Hermes Agent suggest_automations error: {err}"
+            ) from err
 
     async def _handle_analyze_automation(call: ServiceCall) -> ServiceResponse:
         """Analyze an automation for potential bugs, improvements, or syntax issues."""
@@ -385,7 +393,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
         elif yaml_content:
             code_to_analyze = yaml_content
         else:
-            raise HomeAssistantError("Must specify either automation_entity_id or yaml_content")
+            raise HomeAssistantError(
+                "Must specify either automation_entity_id or yaml_content"
+            )
 
         user_prompt = (
             f"Analyze this Home Assistant automation for bugs, edge cases, performance improvements, or modern syntax:\n\n"
@@ -414,11 +424,15 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 max_tokens=3000,
             )
             choices = resp.get("choices", [])
-            analysis = choices[0].get("message", {}).get("content", "") if choices else ""
+            analysis = (
+                choices[0].get("message", {}).get("content", "") if choices else ""
+            )
             return {"analysis": analysis, "model": model}
         except Exception as err:
             _LOGGER.error("Failed to analyze automation: %s", err)
-            raise HomeAssistantError(f"Hermes Agent analyze_automation error: {err}") from err
+            raise HomeAssistantError(
+                f"Hermes Agent analyze_automation error: {err}"
+            ) from err
 
     async def _handle_diagnose_logs(call: ServiceCall) -> ServiceResponse:
         """Diagnose system error logs or provided error text."""
@@ -441,7 +455,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 logs_content = "\n".join(records)
 
         if not logs_content:
-            logs_content = "No direct error log text provided or found in recent system log cache."
+            logs_content = (
+                "No direct error log text provided or found in recent system log cache."
+            )
 
         user_prompt = (
             f"Analyze the following Home Assistant error log excerpt:\n\n```text\n{logs_content}\n```\n\n"
@@ -472,11 +488,15 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 max_tokens=3000,
             )
             choices = resp.get("choices", [])
-            diagnosis = choices[0].get("message", {}).get("content", "") if choices else ""
+            diagnosis = (
+                choices[0].get("message", {}).get("content", "") if choices else ""
+            )
             return {"diagnosis": diagnosis, "model": model}
         except Exception as err:
             _LOGGER.error("Failed to diagnose logs: %s", err)
-            raise HomeAssistantError(f"Hermes Agent diagnose_logs error: {err}") from err
+            raise HomeAssistantError(
+                f"Hermes Agent diagnose_logs error: {err}"
+            ) from err
 
     async def _handle_analyze_camera(call: ServiceCall) -> ServiceResponse:
         """Capture camera frame and analyze image with multimodal Hermes vision."""
@@ -519,7 +539,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 max_tokens=2048,
             )
             choices = resp.get("choices", [])
-            analysis = choices[0].get("message", {}).get("content", "") if choices else ""
+            analysis = (
+                choices[0].get("message", {}).get("content", "") if choices else ""
+            )
             return {
                 "camera_entity_id": camera_entity_id,
                 "analysis": analysis,
@@ -527,7 +549,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
             }
         except Exception as err:
             _LOGGER.error("Failed to analyze camera snapshot: %s", err)
-            raise HomeAssistantError(f"Hermes Agent analyze_camera error: {err}") from err
+            raise HomeAssistantError(
+                f"Hermes Agent analyze_camera error: {err}"
+            ) from err
 
     # Register all services
     service_defs = [
@@ -536,8 +560,16 @@ def async_setup_services(hass: HomeAssistant) -> None:
         (SERVICE_REFRESH_STATUS, _handle_refresh_status, REFRESH_STATUS_SCHEMA),
         (SERVICE_PAUSE_JOB, _handle_pause_job, PAUSE_JOB_SCHEMA),
         (SERVICE_CREATE_SESSION, _handle_create_session, CREATE_SESSION_SCHEMA),
-        (SERVICE_SUGGEST_AUTOMATIONS, _handle_suggest_automations, SUGGEST_AUTOMATIONS_SCHEMA),
-        (SERVICE_ANALYZE_AUTOMATION, _handle_analyze_automation, ANALYZE_AUTOMATION_SCHEMA),
+        (
+            SERVICE_SUGGEST_AUTOMATIONS,
+            _handle_suggest_automations,
+            SUGGEST_AUTOMATIONS_SCHEMA,
+        ),
+        (
+            SERVICE_ANALYZE_AUTOMATION,
+            _handle_analyze_automation,
+            ANALYZE_AUTOMATION_SCHEMA,
+        ),
         (SERVICE_DIAGNOSE_LOGS, _handle_diagnose_logs, DIAGNOSE_LOGS_SCHEMA),
         (SERVICE_ANALYZE_CAMERA, _handle_analyze_camera, ANALYZE_CAMERA_SCHEMA),
     ]

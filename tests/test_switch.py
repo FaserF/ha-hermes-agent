@@ -42,7 +42,9 @@ async def test_switch_toggle_actions(hass, mock_config_entry):
     mock_coord = MagicMock()
     mock_client = MagicMock()
 
-    auto_switch = HermesAgentAutonomousSwitch(mock_coord, mock_config_entry, mock_client)
+    auto_switch = HermesAgentAutonomousSwitch(
+        mock_coord, mock_config_entry, mock_client
+    )
     auto_switch.hass = hass
     assert auto_switch.is_on is True
 
@@ -52,7 +54,9 @@ async def test_switch_toggle_actions(hass, mock_config_entry):
     await auto_switch.async_turn_on()
     assert mock_config_entry.options[CONF_AUTONOMOUS_EXECUTION] is True
 
-    telemetry_switch = HermesAgentTelemetrySwitch(mock_coord, mock_config_entry, mock_client)
+    telemetry_switch = HermesAgentTelemetrySwitch(
+        mock_coord, mock_config_entry, mock_client
+    )
     telemetry_switch.hass = hass
     assert telemetry_switch.is_on is True
 
