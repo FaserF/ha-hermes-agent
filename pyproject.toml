@@ -1,6 +1,6 @@
 [project]
 name = "ha-hermes-agent"
-version = "1.1.0"
+version = "1.0.0"
 description = "Home Assistant integration for Hermes Agent (Nous Research)."
 authors = [
     {name = "FaserF", email = "github@fabiseitz.de"}
