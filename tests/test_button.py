@@ -46,6 +46,8 @@ async def test_button_press_actions(hass, mock_config_entry):
     await btn_refresh.async_press()
     assert mock_coord.async_refresh.called
 
-    btn_health = HermesAgentHealthCheckButton(mock_coord, mock_client, mock_config_entry)
+    btn_health = HermesAgentHealthCheckButton(
+        mock_coord, mock_client, mock_config_entry
+    )
     await btn_health.async_press()
     assert mock_client.async_get_health_detailed.called

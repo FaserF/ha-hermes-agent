@@ -17,11 +17,7 @@ def _get_keys(data: dict, prefix: str = "") -> set[str]:
 
 def test_translation_keys_parity():
     """Verify en.json and de.json have parity with strings.json."""
-    base_dir = (
-        Path(__file__).parent.parent
-        / "custom_components"
-        / "hermes_agent"
-    )
+    base_dir = Path(__file__).parent.parent / "custom_components" / "hermes_agent"
     strings_file = base_dir / "strings.json"
     en_file = base_dir / "translations" / "en.json"
     de_file = base_dir / "translations" / "de.json"

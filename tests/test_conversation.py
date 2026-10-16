@@ -39,7 +39,9 @@ async def test_conversation_process_text(hass, mock_config_entry):
     mock_client.async_chat_completion = AsyncMock(
         return_value={
             "id": "cmpl_1",
-            "choices": [{"message": {"role": "assistant", "content": "The light is turned on."}}],
+            "choices": [
+                {"message": {"role": "assistant", "content": "The light is turned on."}}
+            ],
             "usage": {"total_tokens": 25},
         }
     )
