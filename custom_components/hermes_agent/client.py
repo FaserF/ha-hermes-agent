@@ -85,7 +85,9 @@ class HermesAgentClient:
                         raise InvalidAuth("Invalid gateway API key (API_SERVER_KEY)")
                     if resp.status != 200:
                         text = await resp.text()
-                        raise CannotConnect(f"HTTP {resp.status} checking health: {text}")
+                        raise CannotConnect(
+                            f"HTTP {resp.status} checking health: {text}"
+                        )
 
                     data = await resp.json()
                     return {
@@ -98,7 +100,9 @@ class HermesAgentClient:
         except TimeoutError as err:
             raise CannotConnect(f"Timeout connecting to Hermes Agent at {url}") from err
         except aiohttp.ClientError as err:
-            raise CannotConnect(f"ClientError connecting to Hermes Agent at {url}: {err}") from err
+            raise CannotConnect(
+                f"ClientError connecting to Hermes Agent at {url}: {err}"
+            ) from err
 
     async def async_get_health_detailed(self) -> dict[str, Any]:
         """Fetch detailed health status including readiness and platforms."""
@@ -112,12 +116,16 @@ class HermesAgentClient:
                         raise InvalidAuth("Invalid gateway API key (API_SERVER_KEY)")
                     if resp.status != 200:
                         text = await resp.text()
-                        raise CannotConnect(f"HTTP {resp.status} fetching detailed health: {text}")
+                        raise CannotConnect(
+                            f"HTTP {resp.status} fetching detailed health: {text}"
+                        )
                     return await resp.json()
         except TimeoutError as err:
             raise CannotConnect(f"Timeout fetching detailed health from {url}") from err
         except aiohttp.ClientError as err:
-            raise CannotConnect(f"ClientError fetching detailed health from {url}: {err}") from err
+            raise CannotConnect(
+                f"ClientError fetching detailed health from {url}: {err}"
+            ) from err
 
     async def async_get_models(self) -> list[str]:
         """Fetch available models from Hermes Agent."""
@@ -131,7 +139,9 @@ class HermesAgentClient:
                         raise InvalidAuth("Invalid authentication token")
                     if resp.status != 200:
                         text = await resp.text()
-                        raise CannotConnect(f"HTTP {resp.status} while fetching models: {text}")
+                        raise CannotConnect(
+                            f"HTTP {resp.status} while fetching models: {text}"
+                        )
 
                     data = await resp.json()
                     models = [
@@ -145,7 +155,9 @@ class HermesAgentClient:
         except TimeoutError as err:
             raise CannotConnect(f"Timeout connecting to Hermes Agent at {url}") from err
         except aiohttp.ClientError as err:
-            raise CannotConnect(f"ClientError fetching models from {url}: {err}") from err
+            raise CannotConnect(
+                f"ClientError fetching models from {url}: {err}"
+            ) from err
 
     async def async_chat_completion(
         self,
@@ -176,19 +188,31 @@ class HermesAgentClient:
 
         try:
             async with asyncio.timeout(self._timeout):
-                async with self._session.post(url, headers=headers, json=payload) as resp:
+                async with self._session.post(
+                    url, headers=headers, json=payload
+                ) as resp:
                     if resp.status == 401:
-                        raise InvalidAuth("Invalid authentication token for chat completion")
+                        raise InvalidAuth(
+                            "Invalid authentication token for chat completion"
+                        )
                     if resp.status == 404:
-                        raise ModelNotFoundError(f"Model '{model}' not found in Hermes Agent")
+                        raise ModelNotFoundError(
+                            f"Model '{model}' not found in Hermes Agent"
+                        )
                     if resp.status != 200:
                         err_text = await resp.text()
-                        raise HermesAgentError(f"HTTP {resp.status} in chat completion: {err_text}")
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} in chat completion: {err_text}"
+                        )
                     return await resp.json()
         except TimeoutError as err:
-            raise CannotConnect(f"Timeout waiting for Hermes Agent completion at {url}") from err
+            raise CannotConnect(
+                f"Timeout waiting for Hermes Agent completion at {url}"
+            ) from err
         except aiohttp.ClientError as err:
-            raise CannotConnect(f"ClientError during chat completion at {url}: {err}") from err
+            raise CannotConnect(
+                f"ClientError during chat completion at {url}: {err}"
+            ) from err
 
     async def async_get_sessions(self) -> list[dict[str, Any]]:
         """Fetch list of conversation sessions from Hermes Agent."""
@@ -220,17 +244,23 @@ class HermesAgentClient:
 
         try:
             async with asyncio.timeout(self._timeout):
-                async with self._session.post(url, headers=headers, json=payload) as resp:
+                async with self._session.post(
+                    url, headers=headers, json=payload
+                ) as resp:
                     if resp.status == 401:
                         raise InvalidAuth("Invalid authentication token")
                     if resp.status not in (200, 201):
                         text = await resp.text()
-                        raise HermesAgentError(f"HTTP {resp.status} creating session: {text}")
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} creating session: {text}"
+                        )
                     return await resp.json()
         except TimeoutError as err:
             raise CannotConnect(f"Timeout creating session at {url}") from err
         except aiohttp.ClientError as err:
-            raise CannotConnect(f"ClientError creating session at {url}: {err}") from err
+            raise CannotConnect(
+                f"ClientError creating session at {url}: {err}"
+            ) from err
 
     async def async_send_session_chat(
         self, session_id: str, message: str
@@ -242,17 +272,23 @@ class HermesAgentClient:
 
         try:
             async with asyncio.timeout(self._timeout):
-                async with self._session.post(url, headers=headers, json=payload) as resp:
+                async with self._session.post(
+                    url, headers=headers, json=payload
+                ) as resp:
                     if resp.status == 401:
                         raise InvalidAuth("Invalid authentication token")
                     if resp.status != 200:
                         text = await resp.text()
-                        raise HermesAgentError(f"HTTP {resp.status} sending session chat: {text}")
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} sending session chat: {text}"
+                        )
                     return await resp.json()
         except TimeoutError as err:
             raise CannotConnect(f"Timeout chatting with session {session_id}") from err
         except aiohttp.ClientError as err:
-            raise CannotConnect(f"ClientError chatting with session {session_id}: {err}") from err
+            raise CannotConnect(
+                f"ClientError chatting with session {session_id}: {err}"
+            ) from err
 
     async def async_get_jobs(self) -> list[dict[str, Any]]:
         """Fetch list of scheduled background jobs."""
@@ -288,7 +324,9 @@ class HermesAgentClient:
                         raise InvalidAuth("Invalid authentication token")
                     if resp.status != 200:
                         text = await resp.text()
-                        raise HermesAgentError(f"HTTP {resp.status} pausing job {job_id}: {text}")
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} pausing job {job_id}: {text}"
+                        )
                     return await resp.json()
         except TimeoutError as err:
             raise CannotConnect(f"Timeout pausing job {job_id}") from err
