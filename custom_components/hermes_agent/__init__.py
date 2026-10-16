@@ -18,6 +18,7 @@ from .const import (
     PLATFORMS,
 )
 from .coordinator import HermesAgentDataUpdateCoordinator
+from .helpers import set_integration_version
 from .services import async_setup_services, async_unload_services
 
 
@@ -30,6 +31,15 @@ async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Hermes Agent from a config entry."""
+    try:
+        from homeassistant.loader import async_get_integration
+
+        integration = await async_get_integration(hass, DOMAIN)
+        if integration.version:
+            set_integration_version(str(integration.version))
+    except Exception:
+        pass
+
     session = aiohttp_client.async_get_clientsession(hass)
     api_url = entry.data[CONF_API_URL]
     api_key = entry.data.get(CONF_API_KEY)

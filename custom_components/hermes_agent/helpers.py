@@ -12,15 +12,21 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from .const import CONF_API_URL, DEFAULT_MANUFACTURER, DEFAULT_MODEL, DOMAIN
 
 
+_CACHED_VERSION: str | None = None
+
+
 def get_integration_version() -> str:
-    """Read integration version from manifest.json."""
-    try:
-        manifest_path = Path(__file__).parent / "manifest.json"
-        with open(manifest_path, encoding="utf-8") as f:
-            data = json.load(f)
-            return str(data.get("version", "1.0.0"))
-    except Exception:
-        return "1.0.0"
+    """Read integration version."""
+    global _CACHED_VERSION
+    if _CACHED_VERSION is not None:
+        return _CACHED_VERSION
+    return "1.0.0"
+
+
+def set_integration_version(version: str) -> None:
+    """Set cached integration version."""
+    global _CACHED_VERSION
+    _CACHED_VERSION = version
 
 
 def get_device_info(entry: ConfigEntry, sw_version: str | None = None) -> DeviceInfo:
