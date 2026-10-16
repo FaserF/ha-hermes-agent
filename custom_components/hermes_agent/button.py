@@ -40,7 +40,9 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class HermesAgentButton(CoordinatorEntity[HermesAgentDataUpdateCoordinator], ButtonEntity):
+class HermesAgentButton(
+    CoordinatorEntity[HermesAgentDataUpdateCoordinator], ButtonEntity
+):
     """Base class for Hermes Agent buttons."""
 
     _attr_has_entity_name = True
@@ -88,7 +90,9 @@ class HermesAgentRefreshButton(HermesAgentButton):
 
     async def async_press(self) -> None:
         """Force refresh data in coordinator."""
-        _LOGGER.info("Forcing refresh of Hermes Agent gateway for %s", self.entry.entry_id)
+        _LOGGER.info(
+            "Forcing refresh of Hermes Agent gateway for %s", self.entry.entry_id
+        )
         await self.coordinator.async_refresh()
 
 
@@ -116,6 +120,8 @@ class HermesAgentHealthCheckButton(HermesAgentButton):
 
     async def async_press(self) -> None:
         """Run health check and update coordinator."""
-        _LOGGER.info("Running health check on Hermes Agent gateway for %s", self.entry.entry_id)
+        _LOGGER.info(
+            "Running health check on Hermes Agent gateway for %s", self.entry.entry_id
+        )
         await self.client.async_get_health_detailed()
         await self.coordinator.async_refresh()

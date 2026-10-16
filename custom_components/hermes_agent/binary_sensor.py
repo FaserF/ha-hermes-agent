@@ -61,8 +61,9 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[HermesAgentBinarySensorEntityDescription, ...]
         name="Telegram Adapter",
         translation_key="telegram_connected",
         icon="mdi:telegram",
-        is_on_fn=lambda data: data.get("platforms", {}).get("telegram", {}).get("state")
-        == "connected",
+        is_on_fn=lambda data: (
+            data.get("platforms", {}).get("telegram", {}).get("state") == "connected"
+        ),
         extra_fn=lambda data: data.get("platforms", {}).get("telegram", {}),
     ),
     HermesAgentBinarySensorEntityDescription(
@@ -70,8 +71,9 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[HermesAgentBinarySensorEntityDescription, ...]
         name="Teams Adapter",
         translation_key="teams_connected",
         icon="mdi:microsoft-teams",
-        is_on_fn=lambda data: data.get("platforms", {}).get("teams", {}).get("state")
-        == "connected",
+        is_on_fn=lambda data: (
+            data.get("platforms", {}).get("teams", {}).get("state") == "connected"
+        ),
         extra_fn=lambda data: data.get("platforms", {}).get("teams", {}),
     ),
 )

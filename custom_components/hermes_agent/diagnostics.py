@@ -82,7 +82,9 @@ async def async_get_config_entry_diagnostics(
         diag["coordinator"] = {
             "last_update_success": coordinator.last_update_success,
             "data": _to_json_safe(coordinator.data),
-            "models_count": len(coordinator.data.get("models", [])) if coordinator.data else 0,
+            "models_count": len(coordinator.data.get("models", []))
+            if coordinator.data
+            else 0,
         }
     else:
         diag["coordinator"] = None

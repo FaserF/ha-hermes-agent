@@ -7,7 +7,12 @@ from pathlib import Path
 
 def test_semver_format_in_manifest():
     """Verify manifest.json adheres strictly to SemVer (major.minor.patch)."""
-    manifest_path = Path(__file__).parent.parent / "custom_components" / "hermes_agent" / "manifest.json"
+    manifest_path = (
+        Path(__file__).parent.parent
+        / "custom_components"
+        / "hermes_agent"
+        / "manifest.json"
+    )
     assert manifest_path.exists(), "manifest.json must exist"
 
     with open(manifest_path, encoding="utf-8") as f:
@@ -38,9 +43,16 @@ def test_semver_format_in_pyproject():
     assert match is not None, "pyproject.toml must have a version"
     pyproject_version = match.group(1)
 
-    manifest_path = Path(__file__).parent.parent / "custom_components" / "hermes_agent" / "manifest.json"
+    manifest_path = (
+        Path(__file__).parent.parent
+        / "custom_components"
+        / "hermes_agent"
+        / "manifest.json"
+    )
     with open(manifest_path, encoding="utf-8") as f:
         manifest = json.load(f)
     manifest_version = manifest["version"]
 
-    assert pyproject_version == manifest_version, f"Version mismatch: pyproject={pyproject_version}, manifest={manifest_version}"
+    assert pyproject_version == manifest_version, (
+        f"Version mismatch: pyproject={pyproject_version}, manifest={manifest_version}"
+    )
