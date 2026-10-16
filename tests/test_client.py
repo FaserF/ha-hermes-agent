@@ -141,13 +141,16 @@ async def test_client_sessions_and_jobs():
     session = MagicMock()
     mock_resp = AsyncMock()
     mock_resp.status = 200
-    mock_resp.json = AsyncMock(return_value=[{"id": "sess_1", "title": "Test"}])
+    mock_resp.json = AsyncMock(
+        return_value={"object": "list", "data": [{"id": "sess_1", "source": "telegram"}]}
+    )
     session.get.return_value.__aenter__.return_value = mock_resp
 
     client = HermesAgentClient(session, "http://127.0.0.1:8642")
     sessions = await client.async_get_sessions()
     assert len(sessions) == 1
     assert sessions[0]["id"] == "sess_1"
+    assert sessions[0]["source"] == "telegram"
 
     jobs = await client.async_get_jobs()
     assert len(jobs) == 1

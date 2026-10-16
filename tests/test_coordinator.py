@@ -61,6 +61,8 @@ async def test_coordinator_update_success(hass):
     assert data["metrics_today"]["requests"] == 10
     assert data["metrics_today"]["tokens"] == 500
     assert data["latency_ms"] == 12.3
+    assert data["telegram_sessions_count"] == 0
+    assert data["sessions_by_source"] == {"unknown": 2}
 
 
 @pytest.mark.asyncio

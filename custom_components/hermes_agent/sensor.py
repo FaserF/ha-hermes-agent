@@ -79,6 +79,21 @@ SENSOR_DESCRIPTIONS: tuple[HermesAgentSensorEntityDescription, ...] = (
         icon="mdi:forum",
         state_class=SensorStateClass.TOTAL,
         value_fn=lambda data: data.get("sessions_count", 0),
+        extra_fn=lambda data: {
+            "sessions_by_source": data.get("sessions_by_source", {}),
+        },
+    ),
+    HermesAgentSensorEntityDescription(
+        key="telegram_sessions",
+        name="Telegram Sessions",
+        translation_key="telegram_sessions",
+        icon="mdi:telegram",
+        state_class=SensorStateClass.TOTAL,
+        value_fn=lambda data: data.get("telegram_sessions_count", 0),
+        extra_fn=lambda data: {
+            "latest_telegram": data.get("latest_telegram_session"),
+            "telegram_sessions": data.get("telegram_sessions", []),
+        },
     ),
     HermesAgentSensorEntityDescription(
         key="jobs_count",

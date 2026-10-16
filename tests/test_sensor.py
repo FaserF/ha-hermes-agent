@@ -118,6 +118,19 @@ async def test_sensor_native_values(mock_config_entry):
         == "ok"
     )
 
+    mock_coord.data.update(
+        {
+            "telegram_sessions_count": 3,
+            "sessions_count": 50,
+            "sessions_by_source": {"telegram": 3, "cron": 47},
+            "latest_telegram_session": {"id": "tg_123"},
+        }
+    )
+    desc_tg = next(d for d in SENSOR_DESCRIPTIONS if d.key == "telegram_sessions")
+    sensor_tg = HermesAgentSensor(mock_coord, mock_config_entry, desc_tg)
+    assert sensor_tg.native_value == 3
+    assert sensor_tg.extra_state_attributes["latest_telegram"] == {"id": "tg_123"}
+
 
 @pytest.mark.asyncio
 async def test_automation_suggestions_sensor(mock_config_entry):

@@ -81,6 +81,14 @@ class HermesAgentDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             enabled_toolsets = [t for t in toolsets if t.get("enabled", False)]
             latest_job = jobs[0] if jobs else None
 
+            telegram_sessions = [s for s in sessions if s.get("source") == "telegram"]
+            latest_telegram = telegram_sessions[0] if telegram_sessions else None
+
+            sessions_by_source: dict[str, int] = {}
+            for s in sessions:
+                src = s.get("source", "unknown")
+                sessions_by_source[src] = sessions_by_source.get(src, 0) + 1
+
             return {
                 "reachable": health.get("reachable", True),
                 "status": health.get("status", "ok"),
@@ -102,6 +110,10 @@ class HermesAgentDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 "disk_free_gb": disk_free_gb,
                 "sessions": sessions,
                 "sessions_count": len(sessions),
+                "sessions_by_source": sessions_by_source,
+                "telegram_sessions": telegram_sessions,
+                "telegram_sessions_count": len(telegram_sessions),
+                "latest_telegram_session": latest_telegram,
                 "jobs": jobs,
                 "jobs_count": len(jobs),
                 "latest_job": latest_job,

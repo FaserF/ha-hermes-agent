@@ -47,6 +47,7 @@
       "models_count": { "name": "Available Models" },
       "active_agents": { "name": "Active Agents" },
       "sessions_count": { "name": "Active Sessions" },
+      "telegram_sessions": { "name": "Telegram Sessions" },
       "jobs_count": { "name": "Scheduled Jobs" },
       "skills_count": { "name": "Installed Skills" },
       "requests_today": { "name": "Requests Today" },

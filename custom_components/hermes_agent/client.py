@@ -230,7 +230,11 @@ class HermesAgentClient:
                     if isinstance(data, list):
                         return data
                     if isinstance(data, dict):
-                        return data.get("sessions", [])
+                        return (
+                            data.get("data")
+                            if "data" in data
+                            else data.get("sessions", [])
+                        )
                     return []
         except Exception as err:
             LOGGER.debug("Could not fetch sessions: %s", err)
@@ -306,7 +310,11 @@ class HermesAgentClient:
                     if isinstance(data, list):
                         return data
                     if isinstance(data, dict):
-                        return data.get("jobs", [])
+                        return (
+                            data.get("data")
+                            if "data" in data
+                            else data.get("jobs", [])
+                        )
                     return []
         except Exception as err:
             LOGGER.debug("Could not fetch jobs: %s", err)
