@@ -54,9 +54,7 @@ async def async_setup_entry(
     entities.extend(_get_new_job_buttons())
     async_add_entities(entities)
 
-    coordinator.async_add_listener(
-        lambda: async_add_entities(_get_new_job_buttons())
-    )
+    coordinator.async_add_listener(lambda: async_add_entities(_get_new_job_buttons()))
 
 
 class HermesAgentButton(
@@ -181,4 +179,3 @@ class HermesAgentTriggerJobButton(HermesAgentButton):
         )
         await self.client.async_run_job(self.job_id)
         await self.coordinator.async_request_refresh()
-

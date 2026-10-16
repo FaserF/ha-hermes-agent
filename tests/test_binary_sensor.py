@@ -90,7 +90,10 @@ async def test_binary_sensor_states(mock_config_entry):
     desc_webhook = next(
         d for d in BINARY_SENSOR_DESCRIPTIONS if d.key == "webhook_connected"
     )
-    assert HermesAgentBinarySensor(mock_coord, mock_config_entry, desc_webhook).is_on is True
+    assert (
+        HermesAgentBinarySensor(mock_coord, mock_config_entry, desc_webhook).is_on
+        is True
+    )
 
     desc_ha = next(
         d for d in BINARY_SENSOR_DESCRIPTIONS if d.key == "homeassistant_connected"
@@ -100,9 +103,14 @@ async def test_binary_sensor_states(mock_config_entry):
     desc_storage = next(
         d for d in BINARY_SENSOR_DESCRIPTIONS if d.key == "storage_problem"
     )
-    assert HermesAgentBinarySensor(mock_coord, mock_config_entry, desc_storage).is_on is False
+    assert (
+        HermesAgentBinarySensor(mock_coord, mock_config_entry, desc_storage).is_on
+        is False
+    )
 
     # Simulate storage failure
     mock_coord.data["readiness_checks"]["state_db"]["status"] = "corrupt"
-    assert HermesAgentBinarySensor(mock_coord, mock_config_entry, desc_storage).is_on is True
-
+    assert (
+        HermesAgentBinarySensor(mock_coord, mock_config_entry, desc_storage).is_on
+        is True
+    )

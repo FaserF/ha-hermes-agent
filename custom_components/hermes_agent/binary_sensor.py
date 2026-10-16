@@ -106,10 +106,14 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[HermesAgentBinarySensorEntityDescription, ...]
         device_class=BinarySensorDeviceClass.PROBLEM,
         entity_registry_enabled_default=False,
         is_on_fn=lambda data: (
-            (data.get("readiness_checks", {}).get("state_db", {}).get("status")
-             not in (None, "ok"))
-            or (data.get("readiness_checks", {}).get("session_store", {}).get("status")
-                not in (None, "ok"))
+            (
+                data.get("readiness_checks", {}).get("state_db", {}).get("status")
+                not in (None, "ok")
+            )
+            or (
+                data.get("readiness_checks", {}).get("session_store", {}).get("status")
+                not in (None, "ok")
+            )
         ),
         extra_fn=lambda data: {
             "state_db": data.get("readiness_checks", {}).get("state_db", {}),

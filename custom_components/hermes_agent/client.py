@@ -557,7 +557,9 @@ class HermesAgentClient:
         except TimeoutError as err:
             raise CannotConnect(f"Timeout forking session {session_id}") from err
         except aiohttp.ClientError as err:
-            raise CannotConnect(f"ClientError forking session {session_id}: {err}") from err
+            raise CannotConnect(
+                f"ClientError forking session {session_id}: {err}"
+            ) from err
 
     async def async_delete_session(self, session_id: str) -> dict[str, Any]:
         """Delete an old session from Hermes Agent."""
@@ -578,11 +580,11 @@ class HermesAgentClient:
         except TimeoutError as err:
             raise CannotConnect(f"Timeout deleting session {session_id}") from err
         except aiohttp.ClientError as err:
-            raise CannotConnect(f"ClientError deleting session {session_id}: {err}") from err
+            raise CannotConnect(
+                f"ClientError deleting session {session_id}: {err}"
+            ) from err
 
-    async def async_get_session_messages(
-        self, session_id: str
-    ) -> list[dict[str, Any]]:
+    async def async_get_session_messages(self, session_id: str) -> list[dict[str, Any]]:
         """Fetch transcript messages for a session."""
         url = f"{self._root_url}/api/sessions/{session_id}/messages"
         headers = self._get_headers()

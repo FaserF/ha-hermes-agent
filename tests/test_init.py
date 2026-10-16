@@ -191,8 +191,12 @@ async def test_services_execution(hass, mock_config_entry):
     assert res11["success"] is True
 
     # 11. start_run, get_run_status, stop_run, steer_run, approve_run
-    mock_client.async_start_run = AsyncMock(return_value={"id": "run_99", "status": "queued"})
-    mock_client.async_get_run = AsyncMock(return_value={"id": "run_99", "status": "completed"})
+    mock_client.async_start_run = AsyncMock(
+        return_value={"id": "run_99", "status": "queued"}
+    )
+    mock_client.async_get_run = AsyncMock(
+        return_value={"id": "run_99", "status": "completed"}
+    )
     mock_client.async_stop_run = AsyncMock(return_value={"stopped": True})
     mock_client.async_steer_run = AsyncMock(return_value={"steered": True})
     mock_client.async_approve_run = AsyncMock(return_value={"approved": True})
@@ -226,4 +230,3 @@ async def test_services_execution(hass, mock_config_entry):
 
     res18 = await registered_handlers[SERVICE_DELETE_SESSION](call_mock)
     assert res18["session_id"] == "sess_1"
-

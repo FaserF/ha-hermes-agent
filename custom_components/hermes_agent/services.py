@@ -443,7 +443,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
             return {"success": True, "session": result}
         except Exception as err:
             _LOGGER.error("Failed to fork session %s: %s", session_id, err)
-            raise HomeAssistantError(f"Error forking session {session_id}: {err}") from err
+            raise HomeAssistantError(
+                f"Error forking session {session_id}: {err}"
+            ) from err
 
     async def _handle_delete_session(call: ServiceCall) -> ServiceResponse:
         """Delete a conversation session."""
@@ -455,7 +457,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
             return {"success": True, "session_id": session_id}
         except Exception as err:
             _LOGGER.error("Failed to delete session %s: %s", session_id, err)
-            raise HomeAssistantError(f"Error deleting session {session_id}: {err}") from err
+            raise HomeAssistantError(
+                f"Error deleting session {session_id}: {err}"
+            ) from err
 
     async def _handle_suggest_automations(call: ServiceCall) -> ServiceResponse:
         """Analyze actual Home Assistant entities and generate smart automation suggestions."""
@@ -807,4 +811,3 @@ def async_unload_services(hass: HomeAssistant) -> None:
     ]:
         if hass.services.has_service(DOMAIN, service):
             hass.services.async_remove(DOMAIN, service)
-

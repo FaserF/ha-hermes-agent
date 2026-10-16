@@ -71,4 +71,3 @@ async def test_trigger_job_button(mock_config_entry):
     await btn_job.async_press()
     mock_client.async_run_job.assert_called_once_with("job_sync_1")
     assert mock_coord.async_request_refresh.called
-

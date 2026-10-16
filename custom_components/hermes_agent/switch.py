@@ -57,9 +57,7 @@ async def async_setup_entry(
     entities.extend(_get_new_job_entities())
     async_add_entities(entities)
 
-    coordinator.async_add_listener(
-        lambda: async_add_entities(_get_new_job_entities())
-    )
+    coordinator.async_add_listener(lambda: async_add_entities(_get_new_job_entities()))
 
 
 class HermesAgentAutonomousSwitch(
@@ -225,4 +223,3 @@ class HermesAgentJobSwitch(
         """Pause the scheduled job."""
         await self.client.async_pause_job(self.job_id)
         await self.coordinator.async_request_refresh()
-

@@ -217,7 +217,9 @@ async def test_client_session_operations():
     session = MagicMock()
     mock_resp = AsyncMock()
     mock_resp.status = 200
-    mock_resp.json = AsyncMock(return_value={"id": "sess_forked", "messages": [{"role": "user"}]})
+    mock_resp.json = AsyncMock(
+        return_value={"id": "sess_forked", "messages": [{"role": "user"}]}
+    )
     session.post.return_value.__aenter__.return_value = mock_resp
     session.delete.return_value.__aenter__.return_value = mock_resp
     session.get.return_value.__aenter__.return_value = mock_resp
@@ -257,4 +259,3 @@ async def test_client_capabilities_toolsets_and_model_options():
 
     opts = await client.async_get_model_options()
     assert opts.get("object") == "capabilities"
-

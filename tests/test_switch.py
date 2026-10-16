@@ -94,7 +94,11 @@ async def test_job_switch(hass, mock_config_entry):
     mock_client.async_resume_job = AsyncMock()
 
     job_switch = HermesAgentJobSwitch(
-        mock_coord, mock_config_entry, mock_client, "job_sync_1", mock_coord.data["jobs"][0]
+        mock_coord,
+        mock_config_entry,
+        mock_client,
+        "job_sync_1",
+        mock_coord.data["jobs"][0],
     )
     job_switch.hass = hass
 
@@ -106,4 +110,3 @@ async def test_job_switch(hass, mock_config_entry):
 
     await job_switch.async_turn_on()
     mock_client.async_resume_job.assert_called_once_with("job_sync_1")
-
