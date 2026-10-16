@@ -32,10 +32,16 @@ class HermesAgentDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     async def _async_update_data(self) -> dict[str, Any]:
         """Fetch status and telemetry from Hermes Agent."""
         try:
-            # Basic health check
             health = await self.client.async_check_health()
-            models = await self.client.async_get_models()
-            self.models = models
+            try:
+                models = await self.client.async_get_models()
+                self.models = models
+            except Exception as err:
+                if self.models:
+                    LOGGER.debug("Could not refresh models, using cached list: %s", err)
+                    models = self.models
+                else:
+                    raise
 
             # Detailed health and gateway state
             try:
