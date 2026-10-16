@@ -311,9 +311,7 @@ class HermesAgentClient:
                         return data
                     if isinstance(data, dict):
                         return (
-                            data.get("data")
-                            if "data" in data
-                            else data.get("jobs", [])
+                            data.get("data") if "data" in data else data.get("jobs", [])
                         )
                     return []
         except Exception as err:

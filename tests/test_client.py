@@ -142,7 +142,10 @@ async def test_client_sessions_and_jobs():
     mock_resp = AsyncMock()
     mock_resp.status = 200
     mock_resp.json = AsyncMock(
-        return_value={"object": "list", "data": [{"id": "sess_1", "source": "telegram"}]}
+        return_value={
+            "object": "list",
+            "data": [{"id": "sess_1", "source": "telegram"}],
+        }
     )
     session.get.return_value.__aenter__.return_value = mock_resp
 
