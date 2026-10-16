@@ -22,6 +22,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .client import HermesAgentClient
 from .const import (
     CONF_CHAT_MODEL,
+    CONF_LLM_HASS_API,
     CONF_MAX_TOKENS,
     CONF_PROMPT,
     CONF_TEMPERATURE,
@@ -103,37 +104,37 @@ class HermesAgentConversationEntity(
             LOGGER.warning("Error rendering prompt template: %s", exc)
             prompt_str = prompt_raw
 
-        # Prepare LLM API and tools if available
+        # Prepare LLM API and tools if explicitly configured
+        llm_api_id = options.get(CONF_LLM_HASS_API)
         tools: list[dict[str, Any]] | None = None
         llm_api = None
-        try:
-            from homeassistant.helpers import llm
+        if llm_api_id and llm_api_id not in ("none", ""):
+            try:
+                from homeassistant.helpers import llm
 
-            llm_context = llm.LLMContext(
-                platform=DOMAIN,
-                context=user_input.context,
-                user_prompt=user_input.text,
-                language=user_input.language,
-                assistant="conversation",
-                device_id=user_input.device_id,
-            )
-            llm_api = await llm.async_get_api(
-                self.hass, llm.LLM_API_ASSIST, llm_context
-            )
-            if llm_api and getattr(llm_api, "tools", None):
-                tools = [
-                    {
-                        "type": "function",
-                        "function": {
-                            "name": tool.name,
-                            "description": tool.description,
-                            "parameters": tool.parameters,
-                        },
-                    }
-                    for tool in llm_api.tools
-                ]
-        except Exception as exc:  # noqa: BLE001
-            LOGGER.debug("LLM tools could not be loaded: %s", exc)
+                llm_context = llm.LLMContext(
+                    platform=DOMAIN,
+                    context=user_input.context,
+                    user_prompt=user_input.text,
+                    language=user_input.language,
+                    assistant="conversation",
+                    device_id=user_input.device_id,
+                )
+                llm_api = await llm.async_get_api(self.hass, llm_api_id, llm_context)
+                if llm_api and getattr(llm_api, "tools", None):
+                    tools = [
+                        {
+                            "type": "function",
+                            "function": {
+                                "name": tool.name,
+                                "description": tool.description,
+                                "parameters": tool.parameters,
+                            },
+                        }
+                        for tool in llm_api.tools
+                    ]
+            except Exception as exc:  # noqa: BLE001
+                LOGGER.debug("LLM tools could not be loaded: %s", exc)
 
         conversation_id = user_input.conversation_id or uuid.uuid4().hex
         prior_messages = self.history.get(conversation_id, [])
@@ -146,6 +147,7 @@ class HermesAgentConversationEntity(
 
         iterations = 0
         final_text = "I encountered an issue processing your request."
+        is_error = False
 
         while iterations < MAX_TOOL_ITERATIONS:
             iterations += 1
@@ -161,10 +163,13 @@ class HermesAgentConversationEntity(
             except Exception as err:
                 LOGGER.error("Chat completion error: %s", err)
                 final_text = f"Error communicating with Hermes Agent: {err}"
+                is_error = True
                 break
 
             choices = response.get("choices", [])
             if not choices or "message" not in choices[0]:
+                is_error = True
+                final_text = "No response choices returned by Hermes Agent."
                 break
 
             msg = choices[0]["message"]
@@ -215,7 +220,13 @@ class HermesAgentConversationEntity(
         intent_response = conversation.intent.IntentResponse(
             language=user_input.language
         )
-        intent_response.async_set_speech(final_text)
+        if is_error:
+            intent_response.async_set_error(
+                conversation.intent.IntentResponseErrorCode.UNKNOWN,
+                final_text,
+            )
+        else:
+            intent_response.async_set_speech(final_text)
         return ConversationResult(
             response=intent_response,
             conversation_id=conversation_id,

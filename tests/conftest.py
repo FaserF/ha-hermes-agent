@@ -506,12 +506,23 @@ class MockIntentResponse:
     def __init__(self, language: str = "en") -> None:
         self.language = language
         self.speech: str | None = None
+        self.error_code: Any = None
+        self.response_type: Any = "action_done"
 
     def async_set_speech(self, speech: str) -> None:
         self.speech = speech
 
+    def async_set_error(self, code: Any, message: str | None = None) -> None:
+        self.response_type = "error"
+        self.error_code = code
+        if message:
+            self.speech = message
 
-conv_module.intent = types.SimpleNamespace(IntentResponse=MockIntentResponse)
+
+conv_module.intent = types.SimpleNamespace(
+    IntentResponse=MockIntentResponse,
+    IntentResponseErrorCode=types.SimpleNamespace(UNKNOWN="unknown"),
+)
 
 cfg_module = sys.modules["homeassistant.config_entries"]
 cfg_module.ConfigFlow = MockConfigFlow

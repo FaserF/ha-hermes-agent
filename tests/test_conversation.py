@@ -60,3 +60,26 @@ async def test_conversation_process_text(hass, mock_config_entry):
     assert result.response.speech == "The light is turned on."
     assert result.conversation_id == "conv_123"
     assert result.conversation_id in entity.history
+
+
+@pytest.mark.asyncio
+async def test_conversation_process_error(hass, mock_config_entry):
+    """Test conversation error handling."""
+    mock_client = MagicMock()
+    mock_client.async_chat_completion = AsyncMock(
+        side_effect=Exception("Connection timed out")
+    )
+    mock_coord = MagicMock()
+
+    entity = HermesAgentConversationEntity(mock_config_entry, mock_client, mock_coord)
+    entity.hass = hass
+
+    user_input = ConversationInput(
+        text="Turn on the light",
+        conversation_id="conv_err",
+        language="en",
+    )
+
+    result = await entity.async_process(user_input)
+    assert result.response.response_type == "error"
+    assert "Error communicating with Hermes Agent" in str(result.response.speech)
