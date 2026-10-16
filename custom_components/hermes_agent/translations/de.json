@@ -1,0 +1,252 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Mit Hermes Agent verbinden",
+        "description": "Konfigurieren Sie die API-Endpunkt-URL und den API-Schlüssel für Ihre Hermes Agent Instanz.",
+        "data": {
+          "api_url": "API-URL",
+          "api_key": "API-Schlüssel (optional)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Verbindung zum Hermes Agent Gateway fehlgeschlagen. Überprüfen Sie URL und Netzwerk.",
+      "invalid_auth": "Ungültiger API-Schlüssel oder Authentifizierungs-Token.",
+      "unknown": "Ein unerwarteter Fehler ist aufgetreten."
+    },
+    "abort": {
+      "already_configured": "Diese Hermes Agent Instanz ist bereits konfiguriert."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Hermes Agent Optionen",
+        "description": "Passen Sie Modelle, Temperaturen und Prompts für Assist-Konversationen und KI-Aufgaben an.",
+        "data": {
+          "chat_model": "Konversations-Modell",
+          "prompt": "Assist System-Prompt",
+          "temperature": "Assist Temperatur",
+          "top_p": "Assist Top P",
+          "max_tokens": "Assist Max Tokens",
+          "llm_hass_api": "Assist LLM API (Tool Calling)",
+          "ai_task_model": "KI-Aufgaben-Modell",
+          "ai_task_prompt": "KI-Aufgaben System-Prompt",
+          "ai_task_temperature": "KI-Aufgaben Temperatur",
+          "ai_task_max_tokens": "KI-Aufgaben Max Tokens"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "status": { "name": "Gateway-Status" },
+      "gateway_state": { "name": "Gateway-Zustand" },
+      "latency_ms": { "name": "Gateway-Latenz" },
+      "models_count": { "name": "Verfügbare Modelle" },
+      "active_agents": { "name": "Aktive Agenten" },
+      "sessions_count": { "name": "Aktive Sitzungen" },
+      "jobs_count": { "name": "Geplante Aufgaben" },
+      "skills_count": { "name": "Installierte Skills" },
+      "requests_today": { "name": "Anfragen heute" },
+      "messages_today": { "name": "Nachrichten heute" },
+      "tokens_today": { "name": "Tokens heute" },
+      "disk_usage": { "name": "Host-Festplattenbelegung" },
+      "connected_platforms": { "name": "Verbundene Plattformen" },
+      "version": { "name": "Version" },
+      "automation_suggestions": { "name": "Automations-Vorschläge" }
+    },
+    "binary_sensor": {
+      "connectivity": { "name": "Gateway-Konnektivität" },
+      "problem": { "name": "Gateway-Problem" },
+      "busy": { "name": "Gateway beschäftigt" },
+      "telegram_connected": { "name": "Telegram-Adapter" },
+      "teams_connected": { "name": "Teams-Adapter" }
+    },
+    "button": {
+      "refresh_gateway": { "name": "Gateway aktualisieren" },
+      "check_health": { "name": "Zustand prüfen" }
+    },
+    "select": {
+      "chat_model": { "name": "Konversations-Modell" },
+      "ai_task_model": { "name": "KI-Aufgaben-Modell" }
+    },
+    "switch": {
+      "autonomous_execution": { "name": "Autonome Ausführung" },
+      "telemetry": { "name": "Telemetrie-Erfassung" }
+    },
+    "conversation": {
+      "assist": { "name": "Assist" }
+    },
+    "ai_task": {
+      "task_engine": { "name": "Aufgaben-Engine" }
+    }
+  },
+  "services": {
+    "execute_ai_task": {
+      "name": "KI-Aufgabe ausführen",
+      "description": "Führt autonome Denkaufgaben oder generative KI-Aufgaben über Hermes Agent aus.",
+      "fields": {
+        "prompt": {
+          "name": "Prompt",
+          "description": "Aufgabenanweisungen oder Benutzer-Prompt."
+        },
+        "model": {
+          "name": "Modell",
+          "description": "Zielmodell-Name."
+        },
+        "temperature": {
+          "name": "Temperatur",
+          "description": "Sampling-Temperatur zwischen 0.0 und 2.0."
+        },
+        "max_tokens": {
+          "name": "Max Tokens",
+          "description": "Maximale Anzahl zu generierender Tokens."
+        },
+        "system_prompt": {
+          "name": "System-Prompt",
+          "description": "Benutzerdefinierte Systemanweisungen."
+        }
+      }
+    },
+    "send_message": {
+      "name": "Nachricht senden",
+      "description": "Sendet eine Nachricht an eine aktive Hermes Agent Sitzung oder startet einen Chat.",
+      "fields": {
+        "message": {
+          "name": "Nachricht",
+          "description": "Zu sendender Nachrichtentext."
+        },
+        "session_id": {
+          "name": "Sitzungs-ID",
+          "description": "Ziel-Sitzungs-ID (optional)."
+        },
+        "model": {
+          "name": "Modell",
+          "description": "Für die Antwort zu verwendendes Modell."
+        }
+      }
+    },
+    "create_session": {
+      "name": "Sitzung erstellen",
+      "description": "Erstellt eine neue Konversationssitzung in Hermes Agent.",
+      "fields": {
+        "title": {
+          "name": "Titel",
+          "description": "Titel der Sitzung."
+        },
+        "prompt": {
+          "name": "Erster Prompt",
+          "description": "Optionale erste Nachricht für die Sitzung."
+        },
+        "model": {
+          "name": "Modell",
+          "description": "Modell für die Sitzung."
+        }
+      }
+    },
+    "suggest_automations": {
+      "name": "Automationen vorschlagen",
+      "description": "Analysiert Smart-Home-Entitäten und empfiehlt maßgeschneiderte YAML-Automationen.",
+      "fields": {
+        "domains": {
+          "name": "Domänen",
+          "description": "Liste der zu filternden Domänen."
+        },
+        "entity_limit": {
+          "name": "Entitäten-Limit",
+          "description": "Maximale Anzahl zu analysierender Entitäten."
+        },
+        "custom_prompt": {
+          "name": "Benutzerdefinierter Fokus",
+          "description": "Spezifischer Themenschwerpunkt."
+        },
+        "model": {
+          "name": "Modell",
+          "description": "Zu verwendendes Modell."
+        },
+        "send_notification": {
+          "name": "Benachrichtigung senden",
+          "description": "Dauerhafte Benachrichtigung in HA UI erstellen."
+        }
+      }
+    },
+    "analyze_automation": {
+      "name": "Automation analysieren",
+      "description": "Untersucht bestehende Automationen auf Fehler, Race Conditions und Optimierungen.",
+      "fields": {
+        "automation_entity_id": {
+          "name": "Automations-Entität",
+          "description": "Entitäts-ID der Automation."
+        },
+        "yaml_content": {
+          "name": "YAML-Inhalt",
+          "description": "Reiner YAML-Code zur Prüfung."
+        },
+        "custom_prompt": {
+          "name": "Benutzerdefinierte Frage",
+          "description": "Konkrete Fragestellung."
+        },
+        "model": {
+          "name": "Modell",
+          "description": "Zu verwendendes Modell."
+        }
+      }
+    },
+    "diagnose_logs": {
+      "name": "Protokolle diagnostizieren",
+      "description": "Analysiert Home Assistant Fehlereinträge und liefert konkrete Fehlerursachen und Lösungen.",
+      "fields": {
+        "log_text": {
+          "name": "Protokolltext",
+          "description": "Zu untersuchende Fehlerspur."
+        },
+        "hours_back": {
+          "name": "Stunden rückwirkend",
+          "description": "Zeitfenster in Stunden bei System-Log-Abfrage."
+        },
+        "custom_prompt": {
+          "name": "Zusätzlicher Kontext",
+          "description": "Zusätzliche Fehlerdetails."
+        },
+        "model": {
+          "name": "Modell",
+          "description": "Zu verwendendes Modell."
+        }
+      }
+    },
+    "analyze_camera": {
+      "name": "Kamera analysieren",
+      "description": "Untersucht ein Kamerabild mithilfe des multimodalen Hermes-Sehmodells.",
+      "fields": {
+        "camera_entity_id": {
+          "name": "Kamera-Entität",
+          "description": "Kamera-Entitäts-ID."
+        },
+        "prompt": {
+          "name": "Analyse-Prompt",
+          "description": "Wonach im Bild gesucht werden soll."
+        },
+        "model": {
+          "name": "Modell",
+          "description": "Zu verwendendes Sehmodell."
+        }
+      }
+    },
+    "refresh_status": {
+      "name": "Status aktualisieren",
+      "description": "Erzwingt die Aktualisierung des Hermes Agent Gateway-Status und der Metriken."
+    },
+    "pause_job": {
+      "name": "Aufgabe pausieren",
+      "description": "Pausiert oder setzt eine Hintergrundaufgabe in Hermes Agent fort.",
+      "fields": {
+        "job_id": {
+          "name": "Aufgaben-ID",
+          "description": "ID der Hintergrundaufgabe."
+        }
+      }
+    }
+  }
+}

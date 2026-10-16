@@ -1,0 +1,231 @@
+execute_ai_task:
+  description: Execute an autonomous reasoning or generative AI task via Hermes Agent.
+  fields:
+    prompt:
+      description: The prompt or task instruction for Hermes Agent.
+      example: "Analyze today's energy usage and identify anomalous power consumption."
+      required: true
+      selector:
+        text:
+          multiline: true
+    model:
+      description: Target model name (defaults to configured AI task model).
+      example: "hermes-agent"
+      required: false
+      selector:
+        text: {}
+    temperature:
+      description: Sampling temperature between 0.0 and 2.0.
+      example: 0.2
+      required: false
+      selector:
+        number:
+          min: 0.0
+          max: 2.0
+          step: 0.05
+          mode: box
+    max_tokens:
+      description: Maximum tokens to generate in response.
+      example: 4096
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 32768
+          mode: box
+    system_prompt:
+      description: Custom system instruction overriding default.
+      example: "You are an autonomous AI specialist for Home Assistant diagnostics."
+      required: false
+      selector:
+        text:
+          multiline: true
+
+send_message:
+  description: Send a message to an active Hermes Agent session or initiate a direct chat.
+  fields:
+    message:
+      description: Message content to send to Hermes Agent.
+      example: "Check living room lights status."
+      required: true
+      selector:
+        text:
+          multiline: true
+    session_id:
+      description: Target session ID (optional).
+      example: "sess_123456"
+      required: false
+      selector:
+        text: {}
+    model:
+      description: Model to use for response.
+      example: "hermes-agent"
+      required: false
+      selector:
+        text: {}
+
+create_session:
+  description: Create a new autonomous conversation session in Hermes Agent.
+  fields:
+    title:
+      description: Descriptive title for the session.
+      example: "Morning Diagnostics"
+      required: false
+      selector:
+        text: {}
+    prompt:
+      description: Optional initial prompt to send into the new session.
+      example: "Summarize temperature trends across all rooms."
+      required: false
+      selector:
+        text:
+          multiline: true
+    model:
+      description: Model to use for the session.
+      example: "hermes-agent"
+      required: false
+      selector:
+        text: {}
+
+suggest_automations:
+  description: Analyze real Home Assistant entities and generate tailor-made YAML automations.
+  fields:
+    domains:
+      description: Target entity domains to inspect (e.g. light, switch, climate, binary_sensor).
+      example: ["light", "motion", "climate"]
+      required: false
+      selector:
+        object: {}
+    entity_limit:
+      description: Maximum number of active entities to sample.
+      example: 30
+      default: 30
+      required: false
+      selector:
+        number:
+          min: 5
+          max: 100
+          mode: box
+    custom_prompt:
+      description: Specific focus, requirement, or theme for the suggested automation.
+      example: "Focus on energy conservation when everyone leaves the home."
+      required: false
+      selector:
+        text:
+          multiline: true
+    model:
+      description: Target model to generate suggestions.
+      example: "hermes-agent"
+      required: false
+      selector:
+        text: {}
+    send_notification:
+      description: Dispatch a persistent notification into Home Assistant UI.
+      example: true
+      default: true
+      required: false
+      selector:
+        boolean: {}
+
+analyze_automation:
+  description: Deeply inspect an existing automation for race conditions, syntax errors, and improvements.
+  fields:
+    automation_entity_id:
+      description: Entity ID of an existing automation in Home Assistant.
+      example: "automation.living_room_motion"
+      required: false
+      selector:
+        entity:
+          domain: automation
+    yaml_content:
+      description: Raw YAML automation code to analyze.
+      example: "alias: Living Room Lights\ntrigger: ..."
+      required: false
+      selector:
+        text:
+          multiline: true
+    custom_prompt:
+      description: Specific question or concern regarding the automation.
+      example: "Why does this trigger multiple times per minute?"
+      required: false
+      selector:
+        text:
+          multiline: true
+    model:
+      description: Target model for analysis.
+      example: "hermes-agent"
+      required: false
+      selector:
+        text: {}
+
+diagnose_logs:
+  description: Analyze Home Assistant error log excerpts and receive root causes and step-by-step fixes.
+  fields:
+    log_text:
+      description: Error log trace to analyze (optional, defaults to recent system log records).
+      example: "KeyError: 'temperature' in custom_components/climate/..."
+      required: false
+      selector:
+        text:
+          multiline: true
+    hours_back:
+      description: Lookback window in hours if querying system logs.
+      example: 2
+      default: 2
+      required: false
+      selector:
+        number:
+          min: 1
+          max: 24
+          mode: box
+    custom_prompt:
+      description: Extra debugging context.
+      example: "This happened right after updating Zigbee2MQTT."
+      required: false
+      selector:
+        text:
+          multiline: true
+    model:
+      description: Target model for diagnostics.
+      example: "hermes-agent"
+      required: false
+      selector:
+        text: {}
+
+analyze_camera:
+  description: Capture a security camera frame and analyze image content with multimodal Hermes vision.
+  fields:
+    camera_entity_id:
+      description: Target camera entity ID.
+      example: "camera.front_door"
+      required: true
+      selector:
+        entity:
+          domain: camera
+    prompt:
+      description: Inspection instruction for the vision model.
+      example: "Is there a package on the porch or anyone approaching the door?"
+      default: "Describe what you see in this security camera snapshot in detail, highlighting any people, activity, or risks."
+      required: false
+      selector:
+        text:
+          multiline: true
+    model:
+      description: Multimodal vision model to use.
+      example: "hermes-agent"
+      required: false
+      selector:
+        text: {}
+
+refresh_status:
+  description: Force refresh Hermes Agent gateway status, health, and telemetry metrics.
+
+pause_job:
+  description: Pause or resume a background scheduled job in Hermes Agent.
+  fields:
+    job_id:
+      description: ID of the background job.
+      example: "job_daily_summary"
+      required: true
+      selector:
+        text: {}

@@ -1,0 +1,47 @@
+name: Feature Request
+description: Suggest an idea or enhancement for the Hermes Agent Home Assistant integration
+title: '[Feature]: '
+labels: ['enhancement', 'triage']
+assignees:
+  - FaserF
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Before submitting
+        - 🔍 Search [existing feature requests](https://github.com/FaserF/ha-hermes-agent/issues?q=label%3Aenhancement) to avoid duplicates
+        - 🔗 View the integration: [![Open your Home Assistant instance and show the hermes_agent integration.](https://my.home-assistant.io/badges/integration.svg)](https://my.home-assistant.io/redirect/integration/?domain=hermes_agent)
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: Is your feature request related to a problem? Describe it clearly.
+      placeholder: "I'm always frustrated when..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: A clear and concise description of what you want to happen.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature_area
+    attributes:
+      label: Feature Area
+      description: Which area of the integration does this feature relate to?
+      options:
+        - AI Task Entity (ai_task.*)
+        - Conversation Agent (conversation.*)
+        - Sensors & Health Telemetry
+        - Binary Sensors
+        - Buttons & Diagnostics
+        - Services & Actions
+        - Configuration & Options
+        - Other
+    validations:
+      required: true

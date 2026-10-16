@@ -1,0 +1,6 @@
+{
+  "name": "Hermes Agent",
+  "render_readme": true,
+  "zip_release": true,
+  "filename": "hermes_agent.zip"
+}

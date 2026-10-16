@@ -1,0 +1,252 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Hermes Agent",
+        "description": "Configure the API endpoint URL and API key for your Hermes Agent instance.",
+        "data": {
+          "api_url": "API URL",
+          "api_key": "API Key (optional)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to Hermes Agent gateway. Check URL and network.",
+      "invalid_auth": "Invalid API key or authentication token.",
+      "unknown": "Unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This Hermes Agent instance is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Hermes Agent Options",
+        "description": "Adjust models, temperatures, and prompts for Assist conversation and AI task reasoning.",
+        "data": {
+          "chat_model": "Conversation Model",
+          "prompt": "Assist System Prompt",
+          "temperature": "Assist Temperature",
+          "top_p": "Assist Top P",
+          "max_tokens": "Assist Max Tokens",
+          "llm_hass_api": "Assist LLM API (Tool Calling)",
+          "ai_task_model": "AI Task Model",
+          "ai_task_prompt": "AI Task System Prompt",
+          "ai_task_temperature": "AI Task Temperature",
+          "ai_task_max_tokens": "AI Task Max Tokens"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "status": { "name": "Gateway Status" },
+      "gateway_state": { "name": "Gateway State" },
+      "latency_ms": { "name": "Gateway Latency" },
+      "models_count": { "name": "Available Models" },
+      "active_agents": { "name": "Active Agents" },
+      "sessions_count": { "name": "Active Sessions" },
+      "jobs_count": { "name": "Scheduled Jobs" },
+      "skills_count": { "name": "Installed Skills" },
+      "requests_today": { "name": "Requests Today" },
+      "messages_today": { "name": "Messages Today" },
+      "tokens_today": { "name": "Tokens Today" },
+      "disk_usage": { "name": "Host Disk Usage" },
+      "connected_platforms": { "name": "Connected Platforms" },
+      "version": { "name": "Version" },
+      "automation_suggestions": { "name": "Automation Suggestions" }
+    },
+    "binary_sensor": {
+      "connectivity": { "name": "Gateway Connectivity" },
+      "problem": { "name": "Gateway Problem" },
+      "busy": { "name": "Gateway Busy" },
+      "telegram_connected": { "name": "Telegram Adapter" },
+      "teams_connected": { "name": "Teams Adapter" }
+    },
+    "button": {
+      "refresh_gateway": { "name": "Refresh Gateway" },
+      "check_health": { "name": "Check Health" }
+    },
+    "select": {
+      "chat_model": { "name": "Conversation Model" },
+      "ai_task_model": { "name": "AI Task Model" }
+    },
+    "switch": {
+      "autonomous_execution": { "name": "Autonomous Execution" },
+      "telemetry": { "name": "Telemetry Reporting" }
+    },
+    "conversation": {
+      "assist": { "name": "Assist" }
+    },
+    "ai_task": {
+      "task_engine": { "name": "Task Engine" }
+    }
+  },
+  "services": {
+    "execute_ai_task": {
+      "name": "Execute AI Task",
+      "description": "Execute autonomous reasoning or generative AI task via Hermes Agent.",
+      "fields": {
+        "prompt": {
+          "name": "Prompt",
+          "description": "Task instructions or prompt."
+        },
+        "model": {
+          "name": "Model",
+          "description": "Target model name."
+        },
+        "temperature": {
+          "name": "Temperature",
+          "description": "Sampling temperature between 0.0 and 2.0."
+        },
+        "max_tokens": {
+          "name": "Max Tokens",
+          "description": "Maximum tokens to generate."
+        },
+        "system_prompt": {
+          "name": "System Prompt",
+          "description": "Custom system instructions."
+        }
+      }
+    },
+    "send_message": {
+      "name": "Send Message",
+      "description": "Send a message to an active Hermes Agent session or chat.",
+      "fields": {
+        "message": {
+          "name": "Message",
+          "description": "Message text to send."
+        },
+        "session_id": {
+          "name": "Session ID",
+          "description": "Target session ID (optional)."
+        },
+        "model": {
+          "name": "Model",
+          "description": "Model to use for response."
+        }
+      }
+    },
+    "create_session": {
+      "name": "Create Session",
+      "description": "Create a new conversation session in Hermes Agent.",
+      "fields": {
+        "title": {
+          "name": "Title",
+          "description": "Session title."
+        },
+        "prompt": {
+          "name": "Initial Prompt",
+          "description": "Optional initial message."
+        },
+        "model": {
+          "name": "Model",
+          "description": "Model for session."
+        }
+      }
+    },
+    "suggest_automations": {
+      "name": "Suggest Automations",
+      "description": "Analyze smart home entities and recommend tailored YAML automations.",
+      "fields": {
+        "domains": {
+          "name": "Domains",
+          "description": "List of domains to filter by."
+        },
+        "entity_limit": {
+          "name": "Entity Limit",
+          "description": "Maximum entities to analyze."
+        },
+        "custom_prompt": {
+          "name": "Custom Focus",
+          "description": "Specific focus or theme."
+        },
+        "model": {
+          "name": "Model",
+          "description": "Model to use."
+        },
+        "send_notification": {
+          "name": "Send Notification",
+          "description": "Post persistent notification."
+        }
+      }
+    },
+    "analyze_automation": {
+      "name": "Analyze Automation",
+      "description": "Inspect an existing automation for errors, race conditions, and optimizations.",
+      "fields": {
+        "automation_entity_id": {
+          "name": "Automation Entity",
+          "description": "Entity ID of automation."
+        },
+        "yaml_content": {
+          "name": "YAML Content",
+          "description": "Raw YAML code to inspect."
+        },
+        "custom_prompt": {
+          "name": "Custom Prompt",
+          "description": "Specific question."
+        },
+        "model": {
+          "name": "Model",
+          "description": "Model to use."
+        }
+      }
+    },
+    "diagnose_logs": {
+      "name": "Diagnose Logs",
+      "description": "Diagnose Home Assistant error traces and provide actionable resolutions.",
+      "fields": {
+        "log_text": {
+          "name": "Log Text",
+          "description": "Error trace to examine."
+        },
+        "hours_back": {
+          "name": "Hours Back",
+          "description": "Lookback window in hours."
+        },
+        "custom_prompt": {
+          "name": "Additional Context",
+          "description": "Extra debugging context."
+        },
+        "model": {
+          "name": "Model",
+          "description": "Model to use."
+        }
+      }
+    },
+    "analyze_camera": {
+      "name": "Analyze Camera",
+      "description": "Inspect camera frame using multimodal Hermes vision.",
+      "fields": {
+        "camera_entity_id": {
+          "name": "Camera Entity",
+          "description": "Camera entity ID."
+        },
+        "prompt": {
+          "name": "Inspection Prompt",
+          "description": "What to look for."
+        },
+        "model": {
+          "name": "Model",
+          "description": "Vision model to use."
+        }
+      }
+    },
+    "refresh_status": {
+      "name": "Refresh Status",
+      "description": "Force refresh Hermes Agent gateway status and metrics."
+    },
+    "pause_job": {
+      "name": "Pause Job",
+      "description": "Pause or resume a background job in Hermes Agent.",
+      "fields": {
+        "job_id": {
+          "name": "Job ID",
+          "description": "ID of the background job."
+        }
+      }
+    }
+  }
+}

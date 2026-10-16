@@ -1,0 +1,14 @@
+{
+  "domain": "hermes_agent",
+  "name": "Hermes Agent",
+  "codeowners": [
+    "@FaserF"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/FaserF/ha-hermes-agent",
+  "integration_type": "hub",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/FaserF/ha-hermes-agent/issues",
+  "requirements": [],
+  "version": "1.0.0-dev0"
+}
