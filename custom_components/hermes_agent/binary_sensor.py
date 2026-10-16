@@ -76,6 +76,46 @@ BINARY_SENSOR_DESCRIPTIONS: tuple[HermesAgentBinarySensorEntityDescription, ...]
         ),
         extra_fn=lambda data: data.get("platforms", {}).get("teams", {}),
     ),
+    HermesAgentBinarySensorEntityDescription(
+        key="webhook_connected",
+        name="Webhook Adapter",
+        translation_key="webhook_connected",
+        icon="mdi:webhook",
+        entity_registry_enabled_default=False,
+        is_on_fn=lambda data: (
+            data.get("platforms", {}).get("webhook", {}).get("state") == "connected"
+        ),
+        extra_fn=lambda data: data.get("platforms", {}).get("webhook", {}),
+    ),
+    HermesAgentBinarySensorEntityDescription(
+        key="homeassistant_connected",
+        name="Home Assistant Connector",
+        translation_key="homeassistant_connected",
+        icon="mdi:home-assistant",
+        entity_registry_enabled_default=False,
+        is_on_fn=lambda data: (
+            data.get("platforms", {}).get("homeassistant", {}).get("state")
+            == "connected"
+        ),
+        extra_fn=lambda data: data.get("platforms", {}).get("homeassistant", {}),
+    ),
+    HermesAgentBinarySensorEntityDescription(
+        key="storage_problem",
+        name="Storage Problem",
+        translation_key="storage_problem",
+        device_class=BinarySensorDeviceClass.PROBLEM,
+        entity_registry_enabled_default=False,
+        is_on_fn=lambda data: (
+            (data.get("readiness_checks", {}).get("state_db", {}).get("status")
+             not in (None, "ok"))
+            or (data.get("readiness_checks", {}).get("session_store", {}).get("status")
+                not in (None, "ok"))
+        ),
+        extra_fn=lambda data: {
+            "state_db": data.get("readiness_checks", {}).get("state_db", {}),
+            "session_store": data.get("readiness_checks", {}).get("session_store", {}),
+        },
+    ),
 )
 
 

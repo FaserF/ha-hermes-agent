@@ -53,6 +53,12 @@
       "messages_today": { "name": "Messages Today" },
       "tokens_today": { "name": "Tokens Today" },
       "disk_usage": { "name": "Host Disk Usage" },
+      "disk_free_gb": { "name": "Host Disk Free" },
+      "latency_p95_ms": { "name": "Response Time P95" },
+      "active_runs": { "name": "Active Background Runs" },
+      "toolsets_count": { "name": "Active Toolsets" },
+      "latest_job_status": { "name": "Latest Job" },
+      "readiness": { "name": "Gateway Readiness" },
       "connected_platforms": { "name": "Connected Platforms" },
       "version": { "name": "Version" },
       "automation_suggestions": { "name": "Automation Suggestions" }
@@ -62,7 +68,10 @@
       "problem": { "name": "Gateway Problem" },
       "busy": { "name": "Gateway Busy" },
       "telegram_connected": { "name": "Telegram Adapter" },
-      "teams_connected": { "name": "Teams Adapter" }
+      "teams_connected": { "name": "Teams Adapter" },
+      "webhook_connected": { "name": "Webhook Adapter" },
+      "homeassistant_connected": { "name": "Home Assistant Connector" },
+      "storage_problem": { "name": "Storage Problem" }
     },
     "button": {
       "refresh_gateway": { "name": "Refresh Gateway" },
@@ -240,11 +249,121 @@
     },
     "pause_job": {
       "name": "Pause Job",
-      "description": "Pause or resume a background job in Hermes Agent.",
+      "description": "Pause a background scheduled job in Hermes Agent.",
       "fields": {
         "job_id": {
           "name": "Job ID",
           "description": "ID of the background job."
+        }
+      }
+    },
+    "resume_job": {
+      "name": "Resume Job",
+      "description": "Resume a paused scheduled job in Hermes Agent.",
+      "fields": {
+        "job_id": {
+          "name": "Job ID",
+          "description": "ID of the background job to resume."
+        }
+      }
+    },
+    "run_job": {
+      "name": "Run Job",
+      "description": "Trigger an immediate run of a background scheduled job.",
+      "fields": {
+        "job_id": {
+          "name": "Job ID",
+          "description": "ID of the background job."
+        }
+      }
+    },
+    "start_run": {
+      "name": "Start Run",
+      "description": "Start a durable asynchronous agent run in Hermes Agent.",
+      "fields": {
+        "input": {
+          "name": "Input Prompt",
+          "description": "Task prompt or instruction."
+        },
+        "model": {
+          "name": "Model",
+          "description": "Model to execute the run."
+        },
+        "session_id": {
+          "name": "Session ID",
+          "description": "Session to associate with this run."
+        }
+      }
+    },
+    "get_run_status": {
+      "name": "Get Run Status",
+      "description": "Fetch current status and output of an agent run.",
+      "fields": {
+        "run_id": {
+          "name": "Run ID",
+          "description": "ID of the agent run."
+        }
+      }
+    },
+    "stop_run": {
+      "name": "Stop Run",
+      "description": "Stop or cancel an ongoing agent run.",
+      "fields": {
+        "run_id": {
+          "name": "Run ID",
+          "description": "ID of the run to stop."
+        }
+      }
+    },
+    "steer_run": {
+      "name": "Steer Run",
+      "description": "Inject guidance or instruction into an active run.",
+      "fields": {
+        "run_id": {
+          "name": "Run ID",
+          "description": "ID of the run."
+        },
+        "message": {
+          "name": "Guidance Message",
+          "description": "Steering input for the agent."
+        }
+      }
+    },
+    "approve_run": {
+      "name": "Approve Run",
+      "description": "Approve or reject tool execution for a run requiring action.",
+      "fields": {
+        "run_id": {
+          "name": "Run ID",
+          "description": "ID of the run."
+        },
+        "action": {
+          "name": "Action",
+          "description": "Approve or reject."
+        },
+        "response": {
+          "name": "Feedback",
+          "description": "Optional human feedback."
+        }
+      }
+    },
+    "fork_session": {
+      "name": "Fork Session",
+      "description": "Fork an existing conversation session into a new branch.",
+      "fields": {
+        "session_id": {
+          "name": "Session ID",
+          "description": "ID of the session to fork."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Delete Session",
+      "description": "Delete a conversation session from Hermes Agent.",
+      "fields": {
+        "session_id": {
+          "name": "Session ID",
+          "description": "ID of the session to delete."
         }
       }
     }

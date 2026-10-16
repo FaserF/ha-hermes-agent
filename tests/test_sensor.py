@@ -79,6 +79,34 @@ async def test_sensor_native_values(mock_config_entry):
     sensor_platforms = HermesAgentSensor(mock_coord, mock_config_entry, desc_platforms)
     assert sensor_platforms.native_value == 1
 
+    mock_coord.data.update({
+        "disk_free_gb": 18.15,
+        "latency_p95_ms": 120.4,
+        "active_runs": 2,
+        "toolsets_count": 14,
+        "latest_job": {"name": "Test Backup Job", "last_status": "ok"},
+        "readiness": {"status": "ok"},
+    })
+
+    desc_df = next(d for d in SENSOR_DESCRIPTIONS if d.key == "disk_free_gb")
+    assert HermesAgentSensor(mock_coord, mock_config_entry, desc_df).native_value == 18.15
+
+    desc_p95 = next(d for d in SENSOR_DESCRIPTIONS if d.key == "latency_p95_ms")
+    assert HermesAgentSensor(mock_coord, mock_config_entry, desc_p95).native_value == 120.4
+
+    desc_runs = next(d for d in SENSOR_DESCRIPTIONS if d.key == "active_runs")
+    assert HermesAgentSensor(mock_coord, mock_config_entry, desc_runs).native_value == 2
+
+    desc_ts = next(d for d in SENSOR_DESCRIPTIONS if d.key == "toolsets_count")
+    assert HermesAgentSensor(mock_coord, mock_config_entry, desc_ts).native_value == 14
+
+    desc_job = next(d for d in SENSOR_DESCRIPTIONS if d.key == "latest_job_status")
+    assert HermesAgentSensor(mock_coord, mock_config_entry, desc_job).native_value == "Test Backup Job"
+
+    desc_ready = next(d for d in SENSOR_DESCRIPTIONS if d.key == "readiness")
+    assert HermesAgentSensor(mock_coord, mock_config_entry, desc_ready).native_value == "ok"
+
+
 
 @pytest.mark.asyncio
 async def test_automation_suggestions_sensor(mock_config_entry):

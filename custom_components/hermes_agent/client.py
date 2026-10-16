@@ -368,3 +368,268 @@ class HermesAgentClient:
         except Exception as err:
             LOGGER.debug("Could not fetch toolsets: %s", err)
             return []
+
+    async def async_resume_job(self, job_id: str) -> dict[str, Any]:
+        """Resume a paused scheduled job."""
+        url = f"{self._root_url}/api/jobs/{job_id}/resume"
+        headers = self._get_headers()
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.post(url, headers=headers) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status != 200:
+                        text = await resp.text()
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} resuming job {job_id}: {text}"
+                        )
+                    return await resp.json()
+        except TimeoutError as err:
+            raise CannotConnect(f"Timeout resuming job {job_id}") from err
+        except aiohttp.ClientError as err:
+            raise CannotConnect(f"ClientError resuming job {job_id}: {err}") from err
+
+    async def async_run_job(self, job_id: str) -> dict[str, Any]:
+        """Trigger an immediate run of a scheduled job."""
+        url = f"{self._root_url}/api/jobs/{job_id}/run"
+        headers = self._get_headers()
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.post(url, headers=headers) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status != 200:
+                        text = await resp.text()
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} triggering job {job_id}: {text}"
+                        )
+                    return await resp.json()
+        except TimeoutError as err:
+            raise CannotConnect(f"Timeout triggering job {job_id}") from err
+        except aiohttp.ClientError as err:
+            raise CannotConnect(f"ClientError triggering job {job_id}: {err}") from err
+
+    async def async_start_run(
+        self,
+        input_text: str,
+        model: str | None = None,
+        session_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Start a durable background agent run."""
+        url = f"{self._v1_url}/runs"
+        headers = self._get_headers()
+        payload: dict[str, Any] = {"input": input_text}
+        if model:
+            payload["model"] = model
+        if session_id:
+            payload["session_id"] = session_id
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.post(
+                    url, headers=headers, json=payload
+                ) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status not in (200, 201, 202):
+                        text = await resp.text()
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} starting run: {text}"
+                        )
+                    return await resp.json()
+        except TimeoutError as err:
+            raise CannotConnect(f"Timeout starting run at {url}") from err
+        except aiohttp.ClientError as err:
+            raise CannotConnect(f"ClientError starting run at {url}: {err}") from err
+
+    async def async_get_run(self, run_id: str) -> dict[str, Any]:
+        """Get status and output of a durable agent run."""
+        url = f"{self._v1_url}/runs/{run_id}"
+        headers = self._get_headers()
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.get(url, headers=headers) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status != 200:
+                        text = await resp.text()
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} fetching run {run_id}: {text}"
+                        )
+                    return await resp.json()
+        except TimeoutError as err:
+            raise CannotConnect(f"Timeout getting run {run_id}") from err
+        except aiohttp.ClientError as err:
+            raise CannotConnect(f"ClientError getting run {run_id}: {err}") from err
+
+    async def async_stop_run(self, run_id: str) -> dict[str, Any]:
+        """Stop/cancel an in-progress agent run."""
+        url = f"{self._v1_url}/runs/{run_id}/stop"
+        headers = self._get_headers()
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.post(url, headers=headers) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status != 200:
+                        text = await resp.text()
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} stopping run {run_id}: {text}"
+                        )
+                    return await resp.json()
+        except TimeoutError as err:
+            raise CannotConnect(f"Timeout stopping run {run_id}") from err
+        except aiohttp.ClientError as err:
+            raise CannotConnect(f"ClientError stopping run {run_id}: {err}") from err
+
+    async def async_steer_run(self, run_id: str, message: str) -> dict[str, Any]:
+        """Inject guidance or instruction into an active run."""
+        url = f"{self._v1_url}/runs/{run_id}/steer"
+        headers = self._get_headers()
+        payload = {"message": message}
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.post(
+                    url, headers=headers, json=payload
+                ) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status != 200:
+                        text = await resp.text()
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} steering run {run_id}: {text}"
+                        )
+                    return await resp.json()
+        except TimeoutError as err:
+            raise CannotConnect(f"Timeout steering run {run_id}") from err
+        except aiohttp.ClientError as err:
+            raise CannotConnect(f"ClientError steering run {run_id}: {err}") from err
+
+    async def async_approve_run(
+        self, run_id: str, action: str = "approve", response: str | None = None
+    ) -> dict[str, Any]:
+        """Approve or reject a pending run tool execution."""
+        url = f"{self._v1_url}/runs/{run_id}/approval"
+        headers = self._get_headers()
+        payload: dict[str, Any] = {"action": action}
+        if response:
+            payload["response"] = response
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.post(
+                    url, headers=headers, json=payload
+                ) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status != 200:
+                        text = await resp.text()
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} approving run {run_id}: {text}"
+                        )
+                    return await resp.json()
+        except TimeoutError as err:
+            raise CannotConnect(f"Timeout resolving approval for {run_id}") from err
+        except aiohttp.ClientError as err:
+            raise CannotConnect(f"ClientError resolving approval: {err}") from err
+
+    async def async_fork_session(self, session_id: str) -> dict[str, Any]:
+        """Fork an existing conversation session into a branch."""
+        url = f"{self._root_url}/api/sessions/{session_id}/fork"
+        headers = self._get_headers()
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.post(url, headers=headers) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status not in (200, 201):
+                        text = await resp.text()
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} forking session {session_id}: {text}"
+                        )
+                    return await resp.json()
+        except TimeoutError as err:
+            raise CannotConnect(f"Timeout forking session {session_id}") from err
+        except aiohttp.ClientError as err:
+            raise CannotConnect(f"ClientError forking session {session_id}: {err}") from err
+
+    async def async_delete_session(self, session_id: str) -> dict[str, Any]:
+        """Delete an old session from Hermes Agent."""
+        url = f"{self._root_url}/api/sessions/{session_id}"
+        headers = self._get_headers()
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.delete(url, headers=headers) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status not in (200, 204):
+                        text = await resp.text()
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} deleting session {session_id}: {text}"
+                        )
+                    return {"deleted": True, "session_id": session_id}
+        except TimeoutError as err:
+            raise CannotConnect(f"Timeout deleting session {session_id}") from err
+        except aiohttp.ClientError as err:
+            raise CannotConnect(f"ClientError deleting session {session_id}: {err}") from err
+
+    async def async_get_session_messages(
+        self, session_id: str
+    ) -> list[dict[str, Any]]:
+        """Fetch transcript messages for a session."""
+        url = f"{self._root_url}/api/sessions/{session_id}/messages"
+        headers = self._get_headers()
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.get(url, headers=headers) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status != 200:
+                        return []
+                    data = await resp.json()
+                    return data.get("messages", []) if isinstance(data, dict) else []
+        except Exception as err:
+            LOGGER.debug("Could not fetch messages for session %s: %s", session_id, err)
+            return []
+
+    async def async_get_capabilities(self) -> dict[str, Any]:
+        """Fetch Hermes Agent capabilities manifest."""
+        url = f"{self._v1_url}/capabilities"
+        headers = self._get_headers()
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.get(url, headers=headers) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status != 200:
+                        return {}
+                    return await resp.json()
+        except Exception as err:
+            LOGGER.debug("Could not fetch capabilities: %s", err)
+            return {}
+
+    async def async_get_model_options(self) -> dict[str, Any]:
+        """Fetch Hermes Agent model providers and options."""
+        url = f"{self._root_url}/api/model/options"
+        headers = self._get_headers()
+
+        try:
+            async with asyncio.timeout(self._timeout):
+                async with self._session.get(url, headers=headers) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid authentication token")
+                    if resp.status != 200:
+                        return {}
+                    return await resp.json()
+        except Exception as err:
+            LOGGER.debug("Could not fetch model options: %s", err)
+            return {}

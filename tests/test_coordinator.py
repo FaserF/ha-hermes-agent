@@ -44,6 +44,9 @@ async def test_coordinator_update_success(hass):
     )
     client.async_get_jobs = AsyncMock(return_value=[{"id": "job_1"}])
     client.async_get_skills = AsyncMock(return_value=[{"id": "skill_1"}])
+    client.async_get_toolsets = AsyncMock(return_value=[])
+    client.async_get_capabilities = AsyncMock(return_value={})
+    client.async_get_model_options = AsyncMock(return_value=[])
 
     coord = HermesAgentDataUpdateCoordinator(hass, client)
     data = await coord._async_update_data()

@@ -51,3 +51,24 @@ async def test_button_press_actions(hass, mock_config_entry):
     )
     await btn_health.async_press()
     assert mock_client.async_get_health_detailed.called
+
+
+@pytest.mark.asyncio
+async def test_trigger_job_button(mock_config_entry):
+    """Test HermesAgentTriggerJobButton press action."""
+    from custom_components.hermes_agent.button import HermesAgentTriggerJobButton
+
+    mock_coord = MagicMock()
+    mock_coord.async_request_refresh = AsyncMock()
+    mock_coord.data = {"version": "1.0.0"}
+
+    mock_client = MagicMock()
+    mock_client.async_run_job = AsyncMock()
+
+    btn_job = HermesAgentTriggerJobButton(
+        mock_coord, mock_client, mock_config_entry, "job_sync_1", {"name": "Sync Job"}
+    )
+    await btn_job.async_press()
+    mock_client.async_run_job.assert_called_once_with("job_sync_1")
+    assert mock_coord.async_request_refresh.called
+

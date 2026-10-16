@@ -36,12 +36,21 @@ from .const import (
     DOMAIN,
     SERVICE_ANALYZE_AUTOMATION,
     SERVICE_ANALYZE_CAMERA,
+    SERVICE_APPROVE_RUN,
     SERVICE_CREATE_SESSION,
+    SERVICE_DELETE_SESSION,
     SERVICE_DIAGNOSE_LOGS,
     SERVICE_EXECUTE_AI_TASK,
+    SERVICE_FORK_SESSION,
+    SERVICE_GET_RUN_STATUS,
     SERVICE_PAUSE_JOB,
     SERVICE_REFRESH_STATUS,
+    SERVICE_RESUME_JOB,
+    SERVICE_RUN_JOB,
     SERVICE_SEND_MESSAGE,
+    SERVICE_START_RUN,
+    SERVICE_STEER_RUN,
+    SERVICE_STOP_RUN,
     SERVICE_SUGGEST_AUTOMATIONS,
 )
 from .coordinator import HermesAgentDataUpdateCoordinator
@@ -71,6 +80,65 @@ REFRESH_STATUS_SCHEMA = vol.Schema({})
 PAUSE_JOB_SCHEMA = vol.Schema(
     {
         vol.Required("job_id"): cv.string,
+    }
+)
+
+RESUME_JOB_SCHEMA = vol.Schema(
+    {
+        vol.Required("job_id"): cv.string,
+    }
+)
+
+RUN_JOB_SCHEMA = vol.Schema(
+    {
+        vol.Required("job_id"): cv.string,
+    }
+)
+
+START_RUN_SCHEMA = vol.Schema(
+    {
+        vol.Required("input"): cv.string,
+        vol.Optional("model"): cv.string,
+        vol.Optional("session_id"): cv.string,
+    }
+)
+
+GET_RUN_STATUS_SCHEMA = vol.Schema(
+    {
+        vol.Required("run_id"): cv.string,
+    }
+)
+
+STOP_RUN_SCHEMA = vol.Schema(
+    {
+        vol.Required("run_id"): cv.string,
+    }
+)
+
+STEER_RUN_SCHEMA = vol.Schema(
+    {
+        vol.Required("run_id"): cv.string,
+        vol.Required("message"): cv.string,
+    }
+)
+
+APPROVE_RUN_SCHEMA = vol.Schema(
+    {
+        vol.Required("run_id"): cv.string,
+        vol.Optional("action", default="approve"): vol.In(["approve", "reject"]),
+        vol.Optional("response"): cv.string,
+    }
+)
+
+FORK_SESSION_SCHEMA = vol.Schema(
+    {
+        vol.Required("session_id"): cv.string,
+    }
+)
+
+DELETE_SESSION_SCHEMA = vol.Schema(
+    {
+        vol.Required("session_id"): cv.string,
     }
 )
 
@@ -263,10 +331,131 @@ def async_setup_services(hass: HomeAssistant) -> None:
         job_id = call.data["job_id"]
         try:
             result = await client.async_pause_job(job_id)
+            await coordinator.async_request_refresh()
             return {"success": True, "result": result, "job_id": job_id}
         except Exception as err:
             _LOGGER.error("Failed to pause job %s: %s", job_id, err)
             raise HomeAssistantError(f"Error pausing job {job_id}: {err}") from err
+
+    async def _handle_resume_job(call: ServiceCall) -> ServiceResponse:
+        """Resume a paused scheduled job."""
+        client, coordinator, _, _ = _get_entry_context(hass)
+        job_id = call.data["job_id"]
+        try:
+            result = await client.async_resume_job(job_id)
+            await coordinator.async_request_refresh()
+            return {"success": True, "result": result, "job_id": job_id}
+        except Exception as err:
+            _LOGGER.error("Failed to resume job %s: %s", job_id, err)
+            raise HomeAssistantError(f"Error resuming job {job_id}: {err}") from err
+
+    async def _handle_run_job(call: ServiceCall) -> ServiceResponse:
+        """Trigger an immediate run of a scheduled job."""
+        client, coordinator, _, _ = _get_entry_context(hass)
+        job_id = call.data["job_id"]
+        try:
+            result = await client.async_run_job(job_id)
+            await coordinator.async_request_refresh()
+            return {"success": True, "result": result, "job_id": job_id}
+        except Exception as err:
+            _LOGGER.error("Failed to run job %s: %s", job_id, err)
+            raise HomeAssistantError(f"Error running job {job_id}: {err}") from err
+
+    async def _handle_start_run(call: ServiceCall) -> ServiceResponse:
+        """Start a durable background agent run."""
+        client, _, entry, _ = _get_entry_context(hass)
+        input_text = call.data["input"]
+        model = call.data.get(
+            "model", entry.options.get(CONF_AI_TASK_MODEL, DEFAULT_AI_TASK_MODEL)
+        )
+        session_id = call.data.get("session_id")
+        try:
+            result = await client.async_start_run(
+                input_text=input_text, model=model, session_id=session_id
+            )
+            return {
+                "run": result,
+                "run_id": result.get("id"),
+                "status": result.get("status"),
+            }
+        except Exception as err:
+            _LOGGER.error("Failed to start run: %s", err)
+            raise HomeAssistantError(f"Error starting run: {err}") from err
+
+    async def _handle_get_run_status(call: ServiceCall) -> ServiceResponse:
+        """Get status of an asynchronous agent run."""
+        client, _, _, _ = _get_entry_context(hass)
+        run_id = call.data["run_id"]
+        try:
+            result = await client.async_get_run(run_id)
+            return {
+                "run": result,
+                "run_id": run_id,
+                "status": result.get("status"),
+            }
+        except Exception as err:
+            _LOGGER.error("Failed to get status for run %s: %s", run_id, err)
+            raise HomeAssistantError(f"Error fetching run {run_id}: {err}") from err
+
+    async def _handle_stop_run(call: ServiceCall) -> ServiceResponse:
+        """Stop/interrupt an ongoing agent run."""
+        client, _, _, _ = _get_entry_context(hass)
+        run_id = call.data["run_id"]
+        try:
+            result = await client.async_stop_run(run_id)
+            return {"success": True, "result": result, "run_id": run_id}
+        except Exception as err:
+            _LOGGER.error("Failed to stop run %s: %s", run_id, err)
+            raise HomeAssistantError(f"Error stopping run {run_id}: {err}") from err
+
+    async def _handle_steer_run(call: ServiceCall) -> ServiceResponse:
+        """Steer or inject instructions into an active run."""
+        client, _, _, _ = _get_entry_context(hass)
+        run_id = call.data["run_id"]
+        message = call.data["message"]
+        try:
+            result = await client.async_steer_run(run_id, message)
+            return {"success": True, "result": result, "run_id": run_id}
+        except Exception as err:
+            _LOGGER.error("Failed to steer run %s: %s", run_id, err)
+            raise HomeAssistantError(f"Error steering run {run_id}: {err}") from err
+
+    async def _handle_approve_run(call: ServiceCall) -> ServiceResponse:
+        """Approve or reject tool execution for a run requiring action."""
+        client, _, _, _ = _get_entry_context(hass)
+        run_id = call.data["run_id"]
+        action = call.data.get("action", "approve")
+        response = call.data.get("response")
+        try:
+            result = await client.async_approve_run(run_id, action, response)
+            return {"success": True, "result": result, "run_id": run_id}
+        except Exception as err:
+            _LOGGER.error("Failed to resolve approval for run %s: %s", run_id, err)
+            raise HomeAssistantError(f"Error approving run {run_id}: {err}") from err
+
+    async def _handle_fork_session(call: ServiceCall) -> ServiceResponse:
+        """Fork an existing conversation session into a branch."""
+        client, coordinator, _, _ = _get_entry_context(hass)
+        session_id = call.data["session_id"]
+        try:
+            result = await client.async_fork_session(session_id)
+            await coordinator.async_request_refresh()
+            return {"success": True, "session": result}
+        except Exception as err:
+            _LOGGER.error("Failed to fork session %s: %s", session_id, err)
+            raise HomeAssistantError(f"Error forking session {session_id}: {err}") from err
+
+    async def _handle_delete_session(call: ServiceCall) -> ServiceResponse:
+        """Delete a conversation session."""
+        client, coordinator, _, _ = _get_entry_context(hass)
+        session_id = call.data["session_id"]
+        try:
+            await client.async_delete_session(session_id)
+            await coordinator.async_request_refresh()
+            return {"success": True, "session_id": session_id}
+        except Exception as err:
+            _LOGGER.error("Failed to delete session %s: %s", session_id, err)
+            raise HomeAssistantError(f"Error deleting session {session_id}: {err}") from err
 
     async def _handle_suggest_automations(call: ServiceCall) -> ServiceResponse:
         """Analyze actual Home Assistant entities and generate smart automation suggestions."""
@@ -559,6 +748,15 @@ def async_setup_services(hass: HomeAssistant) -> None:
         (SERVICE_SEND_MESSAGE, _handle_send_message, SEND_MESSAGE_SCHEMA),
         (SERVICE_REFRESH_STATUS, _handle_refresh_status, REFRESH_STATUS_SCHEMA),
         (SERVICE_PAUSE_JOB, _handle_pause_job, PAUSE_JOB_SCHEMA),
+        (SERVICE_RESUME_JOB, _handle_resume_job, RESUME_JOB_SCHEMA),
+        (SERVICE_RUN_JOB, _handle_run_job, RUN_JOB_SCHEMA),
+        (SERVICE_START_RUN, _handle_start_run, START_RUN_SCHEMA),
+        (SERVICE_GET_RUN_STATUS, _handle_get_run_status, GET_RUN_STATUS_SCHEMA),
+        (SERVICE_STOP_RUN, _handle_stop_run, STOP_RUN_SCHEMA),
+        (SERVICE_STEER_RUN, _handle_steer_run, STEER_RUN_SCHEMA),
+        (SERVICE_APPROVE_RUN, _handle_approve_run, APPROVE_RUN_SCHEMA),
+        (SERVICE_FORK_SESSION, _handle_fork_session, FORK_SESSION_SCHEMA),
+        (SERVICE_DELETE_SESSION, _handle_delete_session, DELETE_SESSION_SCHEMA),
         (SERVICE_CREATE_SESSION, _handle_create_session, CREATE_SESSION_SCHEMA),
         (
             SERVICE_SUGGEST_AUTOMATIONS,
@@ -592,6 +790,15 @@ def async_unload_services(hass: HomeAssistant) -> None:
         SERVICE_SEND_MESSAGE,
         SERVICE_REFRESH_STATUS,
         SERVICE_PAUSE_JOB,
+        SERVICE_RESUME_JOB,
+        SERVICE_RUN_JOB,
+        SERVICE_START_RUN,
+        SERVICE_GET_RUN_STATUS,
+        SERVICE_STOP_RUN,
+        SERVICE_STEER_RUN,
+        SERVICE_APPROVE_RUN,
+        SERVICE_FORK_SESSION,
+        SERVICE_DELETE_SESSION,
         SERVICE_CREATE_SESSION,
         SERVICE_SUGGEST_AUTOMATIONS,
         SERVICE_ANALYZE_AUTOMATION,
@@ -600,3 +807,4 @@ def async_unload_services(hass: HomeAssistant) -> None:
     ]:
         if hass.services.has_service(DOMAIN, service):
             hass.services.async_remove(DOMAIN, service)
+

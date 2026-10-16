@@ -14,12 +14,21 @@ from custom_components.hermes_agent.const import (
     DOMAIN,
     SERVICE_ANALYZE_AUTOMATION,
     SERVICE_ANALYZE_CAMERA,
+    SERVICE_APPROVE_RUN,
     SERVICE_CREATE_SESSION,
+    SERVICE_DELETE_SESSION,
     SERVICE_DIAGNOSE_LOGS,
     SERVICE_EXECUTE_AI_TASK,
+    SERVICE_FORK_SESSION,
+    SERVICE_GET_RUN_STATUS,
     SERVICE_PAUSE_JOB,
     SERVICE_REFRESH_STATUS,
+    SERVICE_RESUME_JOB,
+    SERVICE_RUN_JOB,
     SERVICE_SEND_MESSAGE,
+    SERVICE_START_RUN,
+    SERVICE_STEER_RUN,
+    SERVICE_STOP_RUN,
     SERVICE_SUGGEST_AUTOMATIONS,
 )
 
@@ -170,3 +179,51 @@ async def test_services_execution(hass, mock_config_entry):
         res9 = await registered_handlers[SERVICE_ANALYZE_CAMERA](call_mock)
         assert res9["camera_entity_id"] == "camera.front_door"
         assert "analysis" in res9
+
+    # 10. resume_job & run_job
+    mock_client.async_resume_job = AsyncMock(return_value={"resumed": True})
+    mock_client.async_run_job = AsyncMock(return_value={"ran": True})
+    call_mock.data = {"job_id": "job_1"}
+    res10 = await registered_handlers[SERVICE_RESUME_JOB](call_mock)
+    assert res10["success"] is True
+
+    res11 = await registered_handlers[SERVICE_RUN_JOB](call_mock)
+    assert res11["success"] is True
+
+    # 11. start_run, get_run_status, stop_run, steer_run, approve_run
+    mock_client.async_start_run = AsyncMock(return_value={"id": "run_99", "status": "queued"})
+    mock_client.async_get_run = AsyncMock(return_value={"id": "run_99", "status": "completed"})
+    mock_client.async_stop_run = AsyncMock(return_value={"stopped": True})
+    mock_client.async_steer_run = AsyncMock(return_value={"steered": True})
+    mock_client.async_approve_run = AsyncMock(return_value={"approved": True})
+
+    call_mock.data = {"input": "Sweep entities"}
+    res12 = await registered_handlers[SERVICE_START_RUN](call_mock)
+    assert res12["run_id"] == "run_99"
+
+    call_mock.data = {"run_id": "run_99"}
+    res13 = await registered_handlers[SERVICE_GET_RUN_STATUS](call_mock)
+    assert res13["status"] == "completed"
+
+    res14 = await registered_handlers[SERVICE_STOP_RUN](call_mock)
+    assert res14["success"] is True
+
+    call_mock.data = {"run_id": "run_99", "message": "focus"}
+    res15 = await registered_handlers[SERVICE_STEER_RUN](call_mock)
+    assert res15["success"] is True
+
+    call_mock.data = {"run_id": "run_99", "action": "approve"}
+    res16 = await registered_handlers[SERVICE_APPROVE_RUN](call_mock)
+    assert res16["success"] is True
+
+    # 12. fork_session & delete_session
+    mock_client.async_fork_session = AsyncMock(return_value={"id": "sess_forked"})
+    mock_client.async_delete_session = AsyncMock(return_value={"deleted": True})
+
+    call_mock.data = {"session_id": "sess_1"}
+    res17 = await registered_handlers[SERVICE_FORK_SESSION](call_mock)
+    assert res17["success"] is True
+
+    res18 = await registered_handlers[SERVICE_DELETE_SESSION](call_mock)
+    assert res18["session_id"] == "sess_1"
+

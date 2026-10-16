@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/FaserF/ha-hermes-agent/main/brand/logo.png" alt="Hermes Agent Logo" width="360">
+  <img src="https://raw.githubusercontent.com/FaserF/ha-hermes-agent/main/custom_components/hermes_agent/brand/logo.png" alt="Hermes Agent Logo" width="360">
 </p>
 
 # Hermes Agent for Home Assistant

@@ -39,7 +39,27 @@ async def async_setup_entry(
         HermesAgentAutonomousSwitch(coordinator, entry, client),
         HermesAgentTelemetrySwitch(coordinator, entry, client),
     ]
+
+    known_job_ids: set[str] = set()
+
+    def _get_new_job_entities() -> list[SwitchEntity]:
+        new_entities: list[SwitchEntity] = []
+        jobs = coordinator.data.get("jobs", []) if coordinator.data else []
+        for job in jobs:
+            job_id = job.get("id")
+            if job_id and job_id not in known_job_ids:
+                known_job_ids.add(job_id)
+                new_entities.append(
+                    HermesAgentJobSwitch(coordinator, entry, client, job_id, job)
+                )
+        return new_entities
+
+    entities.extend(_get_new_job_entities())
     async_add_entities(entities)
+
+    coordinator.async_add_listener(
+        lambda: async_add_entities(_get_new_job_entities())
+    )
 
 
 class HermesAgentAutonomousSwitch(
@@ -130,3 +150,79 @@ class HermesAgentTelemetrySwitch(
         new_options[CONF_TELEMETRY] = False
         self.hass.config_entries.async_update_entry(self.entry, options=new_options)
         self.async_write_ha_state()
+
+
+class HermesAgentJobSwitch(
+    CoordinatorEntity[HermesAgentDataUpdateCoordinator], SwitchEntity
+):
+    """Switch entity to pause or resume a Hermes Agent scheduled job."""
+
+    _attr_has_entity_name = True
+    _attr_icon = "mdi:calendar-sync"
+    _attr_entity_category = EntityCategory.CONFIG
+    _attr_entity_registry_enabled_default = False
+
+    def __init__(
+        self,
+        coordinator: HermesAgentDataUpdateCoordinator,
+        entry: ConfigEntry,
+        client: HermesAgentClient,
+        job_id: str,
+        job_data: dict[str, Any],
+    ) -> None:
+        """Initialize job switch."""
+        super().__init__(coordinator)
+        self.entry = entry
+        self.client = client
+        self.job_id = job_id
+        job_name = job_data.get("name") or job_id
+        self._attr_name = f"Job {job_name}"
+        self._attr_unique_id = f"{entry.entry_id}_job_{job_id}"
+        sw_version = coordinator.data.get("version") if coordinator.data else None
+        self._attr_device_info = get_device_info(entry, sw_version)
+
+    def _get_job_data(self) -> dict[str, Any]:
+        """Get live job data from coordinator."""
+        if not self.coordinator.data:
+            return {}
+        jobs = self.coordinator.data.get("jobs", [])
+        for job in jobs:
+            if job.get("id") == self.job_id:
+                return job
+        return {}
+
+    @property
+    def is_on(self) -> bool:
+        """Return whether job is currently active/enabled."""
+        job = self._get_job_data()
+        if not job:
+            return False
+        return bool(job.get("enabled", True) and job.get("state") != "paused")
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return extra state attributes for this job."""
+        job = self._get_job_data()
+        return {
+            "job_id": self.job_id,
+            "schedule": (
+                job.get("schedule_display")
+                or (job.get("schedule", {}) or {}).get("expr")
+            ),
+            "next_run_at": job.get("next_run_at"),
+            "last_run_at": job.get("last_run_at"),
+            "last_status": job.get("last_status"),
+            "failure_streak": job.get("failure_streak", 0),
+            "state": job.get("state"),
+        }
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Resume the scheduled job."""
+        await self.client.async_resume_job(self.job_id)
+        await self.coordinator.async_request_refresh()
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Pause the scheduled job."""
+        await self.client.async_pause_job(self.job_id)
+        await self.coordinator.async_request_refresh()
+

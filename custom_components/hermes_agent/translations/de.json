@@ -53,6 +53,12 @@
       "messages_today": { "name": "Nachrichten heute" },
       "tokens_today": { "name": "Tokens heute" },
       "disk_usage": { "name": "Host-Festplattenbelegung" },
+      "disk_free_gb": { "name": "Freier Host-Speicher" },
+      "latency_p95_ms": { "name": "Antwortzeit P95" },
+      "active_runs": { "name": "Aktive Hintergrund-Läufe" },
+      "toolsets_count": { "name": "Aktive Toolsets" },
+      "latest_job_status": { "name": "Letzte Aufgabe" },
+      "readiness": { "name": "Gateway-Betriebsbereitschaft" },
       "connected_platforms": { "name": "Verbundene Plattformen" },
       "version": { "name": "Version" },
       "automation_suggestions": { "name": "Automations-Vorschläge" }
@@ -62,7 +68,10 @@
       "problem": { "name": "Gateway-Problem" },
       "busy": { "name": "Gateway beschäftigt" },
       "telegram_connected": { "name": "Telegram-Adapter" },
-      "teams_connected": { "name": "Teams-Adapter" }
+      "teams_connected": { "name": "Teams-Adapter" },
+      "webhook_connected": { "name": "Webhook-Adapter" },
+      "homeassistant_connected": { "name": "Home Assistant-Konnektor" },
+      "storage_problem": { "name": "Speicher-Problem" }
     },
     "button": {
       "refresh_gateway": { "name": "Gateway aktualisieren" },
@@ -240,11 +249,121 @@
     },
     "pause_job": {
       "name": "Aufgabe pausieren",
-      "description": "Pausiert oder setzt eine Hintergrundaufgabe in Hermes Agent fort.",
+      "description": "Pausiert eine geplante Hintergrundaufgabe in Hermes Agent.",
       "fields": {
         "job_id": {
           "name": "Aufgaben-ID",
           "description": "ID der Hintergrundaufgabe."
+        }
+      }
+    },
+    "resume_job": {
+      "name": "Aufgabe fortsetzen",
+      "description": "Setzt eine pausierte Hintergrundaufgabe in Hermes Agent fort.",
+      "fields": {
+        "job_id": {
+          "name": "Aufgaben-ID",
+          "description": "ID der fortzusetzenden Aufgabe."
+        }
+      }
+    },
+    "run_job": {
+      "name": "Aufgabe ausführen",
+      "description": "Löst die sofortige Ausführung einer Hintergrundaufgabe aus.",
+      "fields": {
+        "job_id": {
+          "name": "Aufgaben-ID",
+          "description": "ID der auszuführenden Aufgabe."
+        }
+      }
+    },
+    "start_run": {
+      "name": "Lauf starten",
+      "description": "Startet einen dauerhaften asynchronen Agentenlauf in Hermes Agent.",
+      "fields": {
+        "input": {
+          "name": "Eingabe-Prompt",
+          "description": "Aufgabenanweisung oder Eingabe."
+        },
+        "model": {
+          "name": "Modell",
+          "description": "Ausführendes Modell."
+        },
+        "session_id": {
+          "name": "Sitzungs-ID",
+          "description": "Zugehörige Sitzung."
+        }
+      }
+    },
+    "get_run_status": {
+      "name": "Laufstatus abrufen",
+      "description": "Ruft aktuellen Status und Ausgaben eines Agentenlaufs ab.",
+      "fields": {
+        "run_id": {
+          "name": "Lauf-ID",
+          "description": "ID des Agentenlaufs."
+        }
+      }
+    },
+    "stop_run": {
+      "name": "Lauf abbrechen",
+      "description": "Stoppt einen laufenden Agentenlauf.",
+      "fields": {
+        "run_id": {
+          "name": "Lauf-ID",
+          "description": "ID des abzubrechenden Laufs."
+        }
+      }
+    },
+    "steer_run": {
+      "name": "Lauf steuern",
+      "description": "Fügt Anweisungen in einen aktiven Agentenlauf ein.",
+      "fields": {
+        "run_id": {
+          "name": "Lauf-ID",
+          "description": "ID des Agentenlaufs."
+        },
+        "message": {
+          "name": "Steuerungsnachricht",
+          "description": "Neue Anweisung für den Agenten."
+        }
+      }
+    },
+    "approve_run": {
+      "name": "Lauf freigeben",
+      "description": "Genehmigt oder verweigert Werkzeugausführung bei wartenden Läufen.",
+      "fields": {
+        "run_id": {
+          "name": "Lauf-ID",
+          "description": "ID des Agentenlaufs."
+        },
+        "action": {
+          "name": "Aktion",
+          "description": "approve (genehmigen) oder reject (ablehnen)."
+        },
+        "response": {
+          "name": "Rückmeldung",
+          "description": "Optionale menschliche Rückmeldung."
+        }
+      }
+    },
+    "fork_session": {
+      "name": "Sitzung verzweigen",
+      "description": "Zweigt eine Konversationssitzung in einen neuen Zweig ab.",
+      "fields": {
+        "session_id": {
+          "name": "Sitzungs-ID",
+          "description": "ID der zu verzweigenden Sitzung."
+        }
+      }
+    },
+    "delete_session": {
+      "name": "Sitzung löschen",
+      "description": "Löscht eine Konversationssitzung aus Hermes Agent.",
+      "fields": {
+        "session_id": {
+          "name": "Sitzungs-ID",
+          "description": "ID der zu löschenden Sitzung."
         }
       }
     }

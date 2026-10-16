@@ -37,7 +37,26 @@ async def async_setup_entry(
         HermesAgentHealthCheckButton(coordinator, client, entry),
     ]
 
+    known_job_ids: set[str] = set()
+
+    def _get_new_job_buttons() -> list[ButtonEntity]:
+        new_buttons: list[ButtonEntity] = []
+        jobs = coordinator.data.get("jobs", []) if coordinator.data else []
+        for job in jobs:
+            job_id = job.get("id")
+            if job_id and job_id not in known_job_ids:
+                known_job_ids.add(job_id)
+                new_buttons.append(
+                    HermesAgentTriggerJobButton(coordinator, client, entry, job_id, job)
+                )
+        return new_buttons
+
+    entities.extend(_get_new_job_buttons())
     async_add_entities(entities)
+
+    coordinator.async_add_listener(
+        lambda: async_add_entities(_get_new_job_buttons())
+    )
 
 
 class HermesAgentButton(
@@ -125,3 +144,41 @@ class HermesAgentHealthCheckButton(HermesAgentButton):
         )
         await self.client.async_get_health_detailed()
         await self.coordinator.async_refresh()
+
+
+class HermesAgentTriggerJobButton(HermesAgentButton):
+    """Button to trigger an immediate run of a scheduled job."""
+
+    _attr_entity_registry_enabled_default = False
+
+    def __init__(
+        self,
+        coordinator: HermesAgentDataUpdateCoordinator,
+        client: HermesAgentClient,
+        entry: ConfigEntry,
+        job_id: str,
+        job_data: dict,
+    ) -> None:
+        """Initialize trigger job button."""
+        self.job_id = job_id
+        job_name = job_data.get("name") or job_id
+        super().__init__(
+            coordinator,
+            client,
+            entry,
+            ButtonEntityDescription(
+                key=f"run_job_{job_id}",
+                name=f"Run Job {job_name}",
+                icon="mdi:play",
+                entity_category=EntityCategory.CONFIG,
+            ),
+        )
+
+    async def async_press(self) -> None:
+        """Trigger immediate run of the job."""
+        _LOGGER.info(
+            "Triggering run for job %s on %s", self.job_id, self.entry.entry_id
+        )
+        await self.client.async_run_job(self.job_id)
+        await self.coordinator.async_request_refresh()
+

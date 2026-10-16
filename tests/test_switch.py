@@ -62,3 +62,48 @@ async def test_switch_toggle_actions(hass, mock_config_entry):
 
     await telemetry_switch.async_turn_off()
     assert mock_config_entry.options[CONF_TELEMETRY] is False
+
+    await telemetry_switch.async_turn_on()
+    assert mock_config_entry.options[CONF_TELEMETRY] is True
+
+
+@pytest.mark.asyncio
+async def test_job_switch(hass, mock_config_entry):
+    """Test dynamic scheduled job switch toggle actions."""
+    from unittest.mock import AsyncMock
+
+    from custom_components.hermes_agent.switch import HermesAgentJobSwitch
+
+    mock_coord = MagicMock()
+    mock_coord.data = {
+        "jobs": [
+            {
+                "id": "job_sync_1",
+                "name": "Sync Job",
+                "enabled": True,
+                "state": "scheduled",
+                "schedule_display": "every 2h",
+                "last_status": "ok",
+            }
+        ]
+    }
+    mock_coord.async_request_refresh = AsyncMock()
+
+    mock_client = MagicMock()
+    mock_client.async_pause_job = AsyncMock()
+    mock_client.async_resume_job = AsyncMock()
+
+    job_switch = HermesAgentJobSwitch(
+        mock_coord, mock_config_entry, mock_client, "job_sync_1", mock_coord.data["jobs"][0]
+    )
+    job_switch.hass = hass
+
+    assert job_switch.is_on is True
+    assert job_switch.extra_state_attributes["schedule"] == "every 2h"
+
+    await job_switch.async_turn_off()
+    mock_client.async_pause_job.assert_called_once_with("job_sync_1")
+
+    await job_switch.async_turn_on()
+    mock_client.async_resume_job.assert_called_once_with("job_sync_1")
+

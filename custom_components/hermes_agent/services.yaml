@@ -221,11 +221,137 @@ refresh_status:
   description: Force refresh Hermes Agent gateway status, health, and telemetry metrics.
 
 pause_job:
-  description: Pause or resume a background scheduled job in Hermes Agent.
+  description: Pause a background scheduled job in Hermes Agent.
   fields:
     job_id:
       description: ID of the background job.
-      example: "job_daily_summary"
+      example: "87480389d0e1"
       required: true
       selector:
         text: {}
+
+resume_job:
+  description: Resume a paused scheduled job in Hermes Agent.
+  fields:
+    job_id:
+      description: ID of the background job to resume.
+      example: "87480389d0e1"
+      required: true
+      selector:
+        text: {}
+
+run_job:
+  description: Trigger an immediate run of a background scheduled job in Hermes Agent.
+  fields:
+    job_id:
+      description: ID of the background job to run immediately.
+      example: "87480389d0e1"
+      required: true
+      selector:
+        text: {}
+
+start_run:
+  description: Start a durable asynchronous background agent run in Hermes Agent.
+  fields:
+    input:
+      description: Task prompt or input for the agent run.
+      example: "Perform full diagnostic sweep on all climate entities."
+      required: true
+      selector:
+        text:
+          multiline: true
+    model:
+      description: Model name to use (optional).
+      example: "hermes-agent"
+      required: false
+      selector:
+        text: {}
+    session_id:
+      description: Existing session ID to associate with this run.
+      example: "sess_123456"
+      required: false
+      selector:
+        text: {}
+
+get_run_status:
+  description: Retrieve status and outputs of an asynchronous agent run.
+  fields:
+    run_id:
+      description: ID of the run (e.g. run_abc123).
+      example: "run_abc123"
+      required: true
+      selector:
+        text: {}
+
+stop_run:
+  description: Stop or interrupt an ongoing background agent run.
+  fields:
+    run_id:
+      description: ID of the run to cancel.
+      example: "run_abc123"
+      required: true
+      selector:
+        text: {}
+
+steer_run:
+  description: Inject guidance or instructions into an active agent run.
+  fields:
+    run_id:
+      description: ID of the active run.
+      example: "run_abc123"
+      required: true
+      selector:
+        text: {}
+    message:
+      description: Guidance message for the agent.
+      example: "Skip Zigbee diagnostics and focus on Matter devices."
+      required: true
+      selector:
+        text:
+          multiline: true
+
+approve_run:
+  description: Grant or deny human approval for a run waiting on tool execution.
+  fields:
+    run_id:
+      description: ID of the run awaiting approval.
+      example: "run_abc123"
+      required: true
+      selector:
+        text: {}
+    action:
+      description: Whether to approve or reject the tool execution.
+      default: "approve"
+      required: false
+      selector:
+        select:
+          options:
+            - "approve"
+            - "reject"
+    response:
+      description: Optional user feedback or explanation.
+      example: "Approved with modification."
+      required: false
+      selector:
+        text: {}
+
+fork_session:
+  description: Fork an existing Hermes conversation session into a new branch.
+  fields:
+    session_id:
+      description: ID of the session to fork.
+      example: "sess_123456"
+      required: true
+      selector:
+        text: {}
+
+delete_session:
+  description: Delete an old conversation session from Hermes Agent.
+  fields:
+    session_id:
+      description: ID of the session to delete.
+      example: "sess_123456"
+      required: true
+      selector:
+        text: {}
+

@@ -162,3 +162,99 @@ async def test_client_connection_error():
     client = HermesAgentClient(session, "http://127.0.0.1:8642")
     with pytest.raises(CannotConnect):
         await client.async_check_health()
+
+
+@pytest.mark.asyncio
+async def test_client_job_controls():
+    """Test job control methods."""
+    session = MagicMock()
+    mock_resp = AsyncMock()
+    mock_resp.status = 200
+    mock_resp.json = AsyncMock(return_value={"status": "ok"})
+    session.post.return_value.__aenter__.return_value = mock_resp
+
+    client = HermesAgentClient(session, "http://127.0.0.1:8642")
+    res_pause = await client.async_pause_job("job_123")
+    assert res_pause["status"] == "ok"
+
+    res_resume = await client.async_resume_job("job_123")
+    assert res_resume["status"] == "ok"
+
+    res_run = await client.async_run_job("job_123")
+    assert res_run["status"] == "ok"
+
+
+@pytest.mark.asyncio
+async def test_client_runs_lifecycle():
+    """Test agent run submission, status, steering, approval, and stop."""
+    session = MagicMock()
+    mock_resp = AsyncMock()
+    mock_resp.status = 200
+    mock_resp.json = AsyncMock(return_value={"id": "run_123", "status": "queued"})
+    session.post.return_value.__aenter__.return_value = mock_resp
+    session.get.return_value.__aenter__.return_value = mock_resp
+
+    client = HermesAgentClient(session, "http://127.0.0.1:8642")
+    run = await client.async_start_run("Do task")
+    assert run["id"] == "run_123"
+
+    status = await client.async_get_run("run_123")
+    assert status["status"] == "queued"
+
+    steer = await client.async_steer_run("run_123", "focus here")
+    assert steer["status"] == "queued"
+
+    approval = await client.async_approve_run("run_123", "approve")
+    assert approval["status"] == "queued"
+
+    stopped = await client.async_stop_run("run_123")
+    assert stopped["status"] == "queued"
+
+
+@pytest.mark.asyncio
+async def test_client_session_operations():
+    """Test fork, delete, and messages operations on sessions."""
+    session = MagicMock()
+    mock_resp = AsyncMock()
+    mock_resp.status = 200
+    mock_resp.json = AsyncMock(return_value={"id": "sess_forked", "messages": [{"role": "user"}]})
+    session.post.return_value.__aenter__.return_value = mock_resp
+    session.delete.return_value.__aenter__.return_value = mock_resp
+    session.get.return_value.__aenter__.return_value = mock_resp
+
+    client = HermesAgentClient(session, "http://127.0.0.1:8642")
+    forked = await client.async_fork_session("sess_orig")
+    assert forked["id"] == "sess_forked"
+
+    deleted = await client.async_delete_session("sess_old")
+    assert deleted["deleted"] is True
+
+    messages = await client.async_get_session_messages("sess_1")
+    assert len(messages) == 1
+
+
+@pytest.mark.asyncio
+async def test_client_capabilities_toolsets_and_model_options():
+    """Test fetching capabilities, toolsets and model options."""
+    session = MagicMock()
+    mock_resp = AsyncMock()
+    mock_resp.status = 200
+    mock_resp.json = AsyncMock(
+        return_value={
+            "data": [{"name": "web", "enabled": True}],
+            "object": "capabilities",
+        }
+    )
+    session.get.return_value.__aenter__.return_value = mock_resp
+
+    client = HermesAgentClient(session, "http://127.0.0.1:8642")
+    toolsets = await client.async_get_toolsets()
+    assert len(toolsets) == 1
+    assert toolsets[0]["name"] == "web"
+
+    caps = await client.async_get_capabilities()
+    assert caps.get("object") == "capabilities"
+
+    opts = await client.async_get_model_options()
+    assert opts.get("object") == "capabilities"
+
