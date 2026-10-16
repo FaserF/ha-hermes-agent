@@ -34,9 +34,7 @@ async def test_sensor_setup_entry(hass, mock_config_entry):
             "tokens": 25000,
         },
         "readiness": {
-            "checks": {
-                "disk": {"used_percent": 35.8, "free_bytes": 1000000000}
-            }
+            "checks": {"disk": {"used_percent": 35.8, "free_bytes": 1000000000}}
         },
         "platforms": {"telegram": {"state": "connected"}},
         "version": "1.0.0",
@@ -61,9 +59,7 @@ async def test_sensor_native_values(mock_config_entry):
     mock_coord.data = {
         "latency_ms": 15.2,
         "readiness": {
-            "checks": {
-                "disk": {"used_percent": 42.0, "free_bytes": 500000000}
-            }
+            "checks": {"disk": {"used_percent": 42.0, "free_bytes": 500000000}}
         },
         "active_agents": 3,
         "platforms": {"telegram": {"state": "connected"}},
@@ -77,7 +73,9 @@ async def test_sensor_native_values(mock_config_entry):
     sensor_disk = HermesAgentSensor(mock_coord, mock_config_entry, desc_disk)
     assert sensor_disk.native_value == 42.0
 
-    desc_platforms = next(d for d in SENSOR_DESCRIPTIONS if d.key == "connected_platforms")
+    desc_platforms = next(
+        d for d in SENSOR_DESCRIPTIONS if d.key == "connected_platforms"
+    )
     sensor_platforms = HermesAgentSensor(mock_coord, mock_config_entry, desc_platforms)
     assert sensor_platforms.native_value == 1
 
@@ -96,5 +94,7 @@ async def test_automation_suggestions_sensor(mock_config_entry):
         entities_processed_count=5,
     )
     assert sugg_sensor.native_value == "Suggestions Available"
-    assert sugg_sensor.extra_state_attributes["description"] == "Turn off lights when away"
+    assert (
+        sugg_sensor.extra_state_attributes["description"] == "Turn off lights when away"
+    )
     assert sugg_sensor.extra_state_attributes["entities_processed_count"] == 5

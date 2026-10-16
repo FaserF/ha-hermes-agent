@@ -127,10 +127,12 @@ SENSOR_DESCRIPTIONS: tuple[HermesAgentSensorEntityDescription, ...] = (
         icon="mdi:harddisk",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
-        value_fn=lambda data: data.get("readiness", {})
-        .get("checks", {})
-        .get("disk", {})
-        .get("used_percent"),
+        value_fn=lambda data: (
+            data.get("readiness", {})
+            .get("checks", {})
+            .get("disk", {})
+            .get("used_percent")
+        ),
         extra_fn=lambda data: {
             "free_bytes": data.get("readiness", {})
             .get("checks", {})
@@ -276,4 +278,3 @@ class HermesAgentAutomationSuggestionsSensor(
             "model": model,
         }
         self.async_write_ha_state()
-

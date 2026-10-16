@@ -49,7 +49,11 @@ class HermesAgentDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             jobs = await self.client.async_get_jobs()
             skills = await self.client.async_get_skills()
 
-            version = detailed.get("version") or health.get("version") or get_integration_version()
+            version = (
+                detailed.get("version")
+                or health.get("version")
+                or get_integration_version()
+            )
             metrics_today = detailed.get("metrics_today") or {}
             api_server_info = detailed.get("api_server") or {}
             platforms = detailed.get("platforms") or {}
@@ -79,4 +83,6 @@ class HermesAgentDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         except (CannotConnect, InvalidAuth, HermesAgentError) as err:
             raise UpdateFailed(f"Error communicating with Hermes Agent: {err}") from err
         except Exception as err:
-            raise UpdateFailed(f"Unexpected error updating Hermes Agent data: {err}") from err
+            raise UpdateFailed(
+                f"Unexpected error updating Hermes Agent data: {err}"
+            ) from err

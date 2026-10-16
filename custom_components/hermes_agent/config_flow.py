@@ -72,7 +72,9 @@ class HermesAgentConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
 
             session = aiohttp_client.async_get_clientsession(self.hass)
-            client = HermesAgentClient(session=session, api_url=api_url, api_key=api_key)
+            client = HermesAgentClient(
+                session=session, api_url=api_url, api_key=api_key
+            )
 
             try:
                 health = await client.async_check_health()
@@ -81,7 +83,9 @@ class HermesAgentConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except InvalidAuth:
                 errors["base"] = "invalid_auth"
             except Exception as err:
-                LOGGER.exception("Unexpected exception connecting to Hermes Agent: %s", err)
+                LOGGER.exception(
+                    "Unexpected exception connecting to Hermes Agent: %s", err
+                )
                 errors["base"] = "unknown"
             else:
                 title = f"{DEFAULT_NAME} ({health.get('version', 'Gateway')})"
@@ -131,7 +135,9 @@ class HermesAgentOptionsFlowHandler(config_entries.OptionsFlow):
         # Fetch models from coordinator or direct client
         models = [DEFAULT_CHAT_MODEL]
         try:
-            entry_store = self.hass.data.get(DOMAIN, {}).get(self.config_entry.entry_id, {})
+            entry_store = self.hass.data.get(DOMAIN, {}).get(
+                self.config_entry.entry_id, {}
+            )
             coordinator = entry_store.get("coordinator")
             if coordinator and coordinator.models:
                 models = coordinator.models
@@ -224,7 +230,9 @@ class HermesAgentOptionsFlowHandler(config_entries.OptionsFlow):
                 ),
                 vol.Optional(
                     CONF_AI_TASK_MODEL,
-                    default=entry_options.get(CONF_AI_TASK_MODEL, DEFAULT_AI_TASK_MODEL),
+                    default=entry_options.get(
+                        CONF_AI_TASK_MODEL, DEFAULT_AI_TASK_MODEL
+                    ),
                 ): SelectSelector(
                     SelectSelectorConfig(
                         options=model_options,
@@ -234,7 +242,9 @@ class HermesAgentOptionsFlowHandler(config_entries.OptionsFlow):
                 ),
                 vol.Optional(
                     CONF_AI_TASK_PROMPT,
-                    default=entry_options.get(CONF_AI_TASK_PROMPT, DEFAULT_AI_TASK_PROMPT),
+                    default=entry_options.get(
+                        CONF_AI_TASK_PROMPT, DEFAULT_AI_TASK_PROMPT
+                    ),
                 ): TemplateSelector(),
                 vol.Optional(
                     CONF_AI_TASK_TEMPERATURE,

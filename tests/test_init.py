@@ -79,13 +79,17 @@ async def test_services_execution(hass, mock_config_entry):
     mock_client = AsyncMock()
     mock_client.async_chat_completion = AsyncMock(
         return_value={
-            "choices": [{"message": {"content": "Task result\n```yaml\nalias: Test\n```"}}],
+            "choices": [
+                {"message": {"content": "Task result\n```yaml\nalias: Test\n```"}}
+            ],
             "model": "hermes-agent",
             "usage": {"total_tokens": 15},
         }
     )
     mock_client.async_send_session_chat = AsyncMock(return_value={"status": "ok"})
-    mock_client.async_create_session = AsyncMock(return_value={"id": "sess_1", "title": "Test"})
+    mock_client.async_create_session = AsyncMock(
+        return_value={"id": "sess_1", "title": "Test"}
+    )
     mock_client.async_pause_job = AsyncMock(return_value={"paused": True})
 
     mock_coord = AsyncMock()

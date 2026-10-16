@@ -66,10 +66,16 @@ async def test_binary_sensor_states(mock_config_entry):
     busy_sensor = HermesAgentBinarySensor(mock_coord, mock_config_entry, desc_busy)
     assert busy_sensor.is_on is True
 
-    desc_telegram = next(d for d in BINARY_SENSOR_DESCRIPTIONS if d.key == "telegram_connected")
-    telegram_sensor = HermesAgentBinarySensor(mock_coord, mock_config_entry, desc_telegram)
+    desc_telegram = next(
+        d for d in BINARY_SENSOR_DESCRIPTIONS if d.key == "telegram_connected"
+    )
+    telegram_sensor = HermesAgentBinarySensor(
+        mock_coord, mock_config_entry, desc_telegram
+    )
     assert telegram_sensor.is_on is True
 
-    desc_teams = next(d for d in BINARY_SENSOR_DESCRIPTIONS if d.key == "teams_connected")
+    desc_teams = next(
+        d for d in BINARY_SENSOR_DESCRIPTIONS if d.key == "teams_connected"
+    )
     teams_sensor = HermesAgentBinarySensor(mock_coord, mock_config_entry, desc_teams)
     assert teams_sensor.is_on is False
