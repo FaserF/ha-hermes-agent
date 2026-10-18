@@ -62,9 +62,17 @@ class HermesAgentDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                 opt_models: list[str] = []
                 for p in model_options.get("providers", []):
                     if isinstance(p, dict) and "models" in p:
-                        opt_models.extend(list(p["models"].keys()))
+                        p_models = p["models"]
+                        if isinstance(p_models, dict):
+                            opt_models.extend(list(p_models.keys()))
+                        elif isinstance(p_models, list):
+                            opt_models.extend([str(x) for x in p_models])
                 if not opt_models and "models" in model_options:
-                    opt_models = list(model_options["models"].keys())
+                    raw_models = model_options["models"]
+                    if isinstance(raw_models, dict):
+                        opt_models = list(raw_models.keys())
+                    elif isinstance(raw_models, list):
+                        opt_models = [str(x) for x in raw_models]
                 for m in opt_models:
                     if m not in models:
                         models.append(m)
