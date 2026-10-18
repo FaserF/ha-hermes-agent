@@ -34,6 +34,7 @@ from .const import (
     CONF_LLM_HASS_API,
     CONF_MAX_TOKENS,
     CONF_PROMPT,
+    CONF_SCAN_INTERVAL,
     CONF_TEMPERATURE,
     CONF_TOP_P,
     DEFAULT_AI_TASK_MAX_TOKENS,
@@ -45,6 +46,7 @@ from .const import (
     DEFAULT_MAX_TOKENS,
     DEFAULT_NAME,
     DEFAULT_PROMPT,
+    DEFAULT_SCAN_INTERVAL,
     DEFAULT_TEMPERATURE,
     DEFAULT_TOP_P,
     DOMAIN,
@@ -270,6 +272,20 @@ class HermesAgentOptionsFlowHandler(config_entries.OptionsFlow):
                         max=32768,
                         step=64,
                         mode=NumberSelectorMode.BOX,
+                    )
+                ),
+                vol.Optional(
+                    CONF_SCAN_INTERVAL,
+                    default=entry_options.get(
+                        CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
+                    ),
+                ): NumberSelector(
+                    NumberSelectorConfig(
+                        min=15,
+                        max=3600,
+                        step=5,
+                        mode=NumberSelectorMode.BOX,
+                        unit_of_measurement="s",
                     )
                 ),
             }

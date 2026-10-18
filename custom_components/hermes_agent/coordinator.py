@@ -9,22 +9,30 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .client import CannotConnect, HermesAgentClient, HermesAgentError, InvalidAuth
-from .const import DOMAIN, LOGGER
+from .const import DEFAULT_SCAN_INTERVAL, DOMAIN, LOGGER
 from .helpers import get_integration_version
 
-UPDATE_INTERVAL = timedelta(seconds=30)
+UPDATE_INTERVAL = timedelta(seconds=DEFAULT_SCAN_INTERVAL)
 
 
 class HermesAgentDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Class to manage fetching Hermes Agent data."""
 
-    def __init__(self, hass: HomeAssistant, client: HermesAgentClient) -> None:
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        client: HermesAgentClient,
+        update_interval: timedelta | None = None,
+    ) -> None:
         """Initialize the coordinator."""
+        if update_interval is None:
+            update_interval = UPDATE_INTERVAL
+
         super().__init__(
             hass,
             LOGGER,
             name=DOMAIN,
-            update_interval=UPDATE_INTERVAL,
+            update_interval=update_interval,
         )
         self.client = client
         self.models: list[str] = []

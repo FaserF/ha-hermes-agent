@@ -39,8 +39,10 @@ CONF_AI_TASK_MAX_TOKENS: Final = "ai_task_max_tokens"
 # Switch options
 CONF_AUTONOMOUS_EXECUTION: Final = "autonomous_execution"
 CONF_TELEMETRY: Final = "telemetry"
+CONF_SCAN_INTERVAL: Final = "scan_interval"
 
 # Default values
+DEFAULT_SCAN_INTERVAL: Final = 180  # seconds (3 minutes)
 DEFAULT_CHAT_MODEL: Final = "hermes-agent"
 DEFAULT_AI_TASK_MODEL: Final = "hermes-agent"
 DEFAULT_TEMPERATURE: Final = 0.7
