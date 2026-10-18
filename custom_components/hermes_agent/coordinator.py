@@ -58,6 +58,16 @@ class HermesAgentDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             capabilities = await self.client.async_get_capabilities()
             model_options = await self.client.async_get_model_options()
+            if isinstance(model_options, dict):
+                opt_models: list[str] = []
+                for p in model_options.get("providers", []):
+                    if isinstance(p, dict) and "models" in p:
+                        opt_models.extend(list(p["models"].keys()))
+                if not opt_models and "models" in model_options:
+                    opt_models = list(model_options["models"].keys())
+                for m in opt_models:
+                    if m not in models:
+                        models.append(m)
 
             version = (
                 detailed.get("version")

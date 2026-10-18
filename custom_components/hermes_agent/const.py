@@ -11,7 +11,7 @@ DOMAIN: Final = "hermes_agent"
 LOGGER: Final = logging.getLogger(__package__)
 
 DEFAULT_NAME: Final = "Hermes Agent"
-DEFAULT_API_URL: Final = "http://100.64.0.1:8642"
+DEFAULT_API_URL: Final = "http://127.0.0.1:8642"
 DEFAULT_MANUFACTURER: Final = "Nous Research"
 DEFAULT_MODEL: Final = "Hermes Agent"
 
