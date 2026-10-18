@@ -36,7 +36,7 @@ class HermesAgentClient:
         session: aiohttp.ClientSession,
         api_url: str,
         api_key: str | None = None,
-        timeout: float = 60.0,
+        timeout: float = 300.0,
     ) -> None:
         """Initialize the Hermes Agent client."""
         self._session = session
