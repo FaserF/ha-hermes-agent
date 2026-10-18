@@ -671,7 +671,9 @@ class HermesAgentClient:
 
         try:
             async with asyncio.timeout(30.0):
-                async with self._session.post(url, headers=headers, json=payload) as resp:
+                async with self._session.post(
+                    url, headers=headers, json=payload
+                ) as resp:
                     if resp.status == 401:
                         raise InvalidAuth("Invalid gateway API key (API_SERVER_KEY)")
                     if resp.status not in (200, 201):
@@ -686,4 +688,3 @@ class HermesAgentClient:
             raise CannotConnect(
                 f"ClientError sending notification to Hermes Agent: {err}"
             ) from err
-

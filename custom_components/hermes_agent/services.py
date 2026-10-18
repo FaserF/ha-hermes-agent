@@ -784,7 +784,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 data=data,
             )
         except Exception as err:
-            _LOGGER.error("Failed to send notification via hermes_agent.notify: %s", err)
+            _LOGGER.error(
+                "Failed to send notification via hermes_agent.notify: %s", err
+            )
             raise HomeAssistantError(f"Hermes Agent notify error: {err}") from err
 
     # Register all services
