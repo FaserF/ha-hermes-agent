@@ -45,6 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     api_key = entry.data.get(CONF_API_KEY)
 
     from datetime import timedelta
+
     from .const import CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
 
     scan_interval_sec = entry.options.get(
@@ -94,6 +95,7 @@ async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     refreshes the coordinator.
     """
     from datetime import timedelta
+
     from .const import CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL
 
     entry_data = hass.data.get(DOMAIN, {}).get(entry.entry_id, {})
