@@ -641,3 +641,49 @@ class HermesAgentClient:
         except Exception as err:
             LOGGER.debug("Could not fetch model options: %s", err)
             return {}
+
+    async def async_send_notification(
+        self,
+        message: str,
+        title: str | None = None,
+        thread_id: str | None = None,
+        chat_id: str | None = None,
+        enrich: bool = True,
+        inline_keyboard: list[Any] | str | None = None,
+        disable_notification: bool = False,
+        data: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Send notification through Hermes Agent to Telegram."""
+        url = f"{self._root_url}/api/ha/notify"
+        headers = self._get_headers()
+        payload: dict[str, Any] = {
+            "message": message,
+            "title": title or "",
+            "thread_id": str(thread_id) if thread_id else "305748",
+            "chat_id": str(chat_id) if chat_id else "649657901",
+            "enrich": bool(enrich),
+            "disable_notification": bool(disable_notification),
+        }
+        if inline_keyboard is not None:
+            payload["inline_keyboard"] = inline_keyboard
+        if data:
+            payload["data"] = data
+
+        try:
+            async with asyncio.timeout(30.0):
+                async with self._session.post(url, headers=headers, json=payload) as resp:
+                    if resp.status == 401:
+                        raise InvalidAuth("Invalid gateway API key (API_SERVER_KEY)")
+                    if resp.status not in (200, 201):
+                        text = await resp.text()
+                        raise HermesAgentError(
+                            f"HTTP {resp.status} sending notification: {text}"
+                        )
+                    return await resp.json()
+        except TimeoutError as err:
+            raise CannotConnect("Timeout sending notification to Hermes Agent") from err
+        except aiohttp.ClientError as err:
+            raise CannotConnect(
+                f"ClientError sending notification to Hermes Agent: {err}"
+            ) from err
+

@@ -1,3 +1,51 @@
+notify:
+  description: Send an AI-enriched or direct notification to Fabian via Hermes Telegram Bot.
+  fields:
+    message:
+      description: The notification message body.
+      example: "Wäsche ist fertig!"
+      required: true
+      selector:
+        text:
+          multiline: true
+    title:
+      description: Optional title for the notification.
+      example: "Waschmaschine"
+      required: false
+      selector:
+        text: {}
+    thread_id:
+      description: Target Telegram topic ID (default 305748 for Smart Home & Media).
+      example: "305748"
+      required: false
+      selector:
+        text: {}
+    chat_id:
+      description: Target Telegram chat ID (defaults to Fabian).
+      example: "649657901"
+      required: false
+      selector:
+        text: {}
+    enrich:
+      description: Whether Hermes should beautify and enrich the message via AI before sending.
+      default: true
+      required: false
+      selector:
+        boolean: {}
+    inline_keyboard:
+      description: Optional inline keyboard buttons or action callbacks.
+      example: ["Ja:/foodyes, Nein:/foodno"]
+      required: false
+    disable_notification:
+      description: Send silently without alert sound.
+      default: false
+      required: false
+      selector:
+        boolean: {}
+    data:
+      description: Extended metadata or platform data.
+      required: false
+
 execute_ai_task:
   description: Execute an autonomous reasoning or generative AI task via Hermes Agent.
   fields:

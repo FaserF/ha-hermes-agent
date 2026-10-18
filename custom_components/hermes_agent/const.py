@@ -69,12 +69,14 @@ PLATFORMS: Final[list[Platform | str]] = [
     Platform.SENSOR,
     Platform.BINARY_SENSOR,
     Platform.BUTTON,
+    Platform.NOTIFY,
     Platform.SELECT,
     Platform.SWITCH,
     PLATFORM_AI_TASK,
 ]
 
 # Services
+SERVICE_NOTIFY: Final = "notify"
 SERVICE_EXECUTE_AI_TASK: Final = "execute_ai_task"
 SERVICE_SEND_MESSAGE: Final = "send_message"
 SERVICE_REFRESH_STATUS: Final = "refresh_status"

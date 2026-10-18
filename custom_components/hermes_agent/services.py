@@ -43,6 +43,7 @@ from .const import (
     SERVICE_EXECUTE_AI_TASK,
     SERVICE_FORK_SESSION,
     SERVICE_GET_RUN_STATUS,
+    SERVICE_NOTIFY,
     SERVICE_PAUSE_JOB,
     SERVICE_REFRESH_STATUS,
     SERVICE_RESUME_JOB,
@@ -55,7 +56,18 @@ from .const import (
 )
 from .coordinator import HermesAgentDataUpdateCoordinator
 
-_LOGGER = logging.getLogger(__name__)
+NOTIFY_SCHEMA = vol.Schema(
+    {
+        vol.Required("message"): cv.string,
+        vol.Optional("title"): cv.string,
+        vol.Optional("thread_id"): cv.string,
+        vol.Optional("chat_id"): cv.string,
+        vol.Optional("enrich", default=True): cv.boolean,
+        vol.Optional("inline_keyboard"): vol.Any(list, cv.string),
+        vol.Optional("disable_notification", default=False): cv.boolean,
+        vol.Optional("data"): dict,
+    }
+)
 
 EXECUTE_AI_TASK_SCHEMA = vol.Schema(
     {
@@ -746,8 +758,36 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 f"Hermes Agent analyze_camera error: {err}"
             ) from err
 
+    async def _handle_notify(call: ServiceCall) -> ServiceResponse:
+        """Send enriched notification to Telegram via Hermes Agent."""
+        client, _, _, _ = _get_entry_context(hass)
+        message = call.data["message"]
+        title = call.data.get("title")
+        thread_id = call.data.get("thread_id", "305748")
+        chat_id = call.data.get("chat_id", "649657901")
+        enrich = call.data.get("enrich", True)
+        inline_keyboard = call.data.get("inline_keyboard")
+        disable_notification = call.data.get("disable_notification", False)
+        data = call.data.get("data")
+
+        try:
+            return await client.async_send_notification(
+                message=message,
+                title=title,
+                thread_id=thread_id,
+                chat_id=chat_id,
+                enrich=enrich,
+                inline_keyboard=inline_keyboard,
+                disable_notification=disable_notification,
+                data=data,
+            )
+        except Exception as err:
+            _LOGGER.error("Failed to send notification via hermes_agent.notify: %s", err)
+            raise HomeAssistantError(f"Hermes Agent notify error: {err}") from err
+
     # Register all services
     service_defs = [
+        (SERVICE_NOTIFY, _handle_notify, NOTIFY_SCHEMA),
         (SERVICE_EXECUTE_AI_TASK, _handle_execute_ai_task, EXECUTE_AI_TASK_SCHEMA),
         (SERVICE_SEND_MESSAGE, _handle_send_message, SEND_MESSAGE_SCHEMA),
         (SERVICE_REFRESH_STATUS, _handle_refresh_status, REFRESH_STATUS_SCHEMA),
@@ -786,10 +826,20 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 supports_response=SupportsResponse.OPTIONAL,
             )
 
+    if hass.services.has_service("notify", "hermes") is not True:
+        hass.services.async_register(
+            "notify",
+            "hermes",
+            _handle_notify,
+            schema=NOTIFY_SCHEMA,
+            supports_response=SupportsResponse.OPTIONAL,
+        )
+
 
 def async_unload_services(hass: HomeAssistant) -> None:
     """Unload all Hermes Agent services."""
     for service in [
+        SERVICE_NOTIFY,
         SERVICE_EXECUTE_AI_TASK,
         SERVICE_SEND_MESSAGE,
         SERVICE_REFRESH_STATUS,
@@ -811,3 +861,6 @@ def async_unload_services(hass: HomeAssistant) -> None:
     ]:
         if hass.services.has_service(DOMAIN, service):
             hass.services.async_remove(DOMAIN, service)
+
+    if hass.services.has_service("notify", "hermes"):
+        hass.services.async_remove("notify", "hermes")
