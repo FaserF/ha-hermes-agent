@@ -257,6 +257,7 @@ mock_submodule("homeassistant.components.select")
 mock_submodule("homeassistant.components.switch")
 mock_submodule("homeassistant.components.diagnostics")
 mock_submodule("homeassistant.components.conversation")
+mock_submodule("homeassistant.components.notify")
 mock_submodule("homeassistant.helpers.device_registry")
 mock_submodule("homeassistant.helpers.entity_registry")
 
@@ -269,6 +270,7 @@ ha_const.Platform = types.SimpleNamespace(
     BUTTON="button",
     SELECT="select",
     SWITCH="switch",
+    NOTIFY="notify",
 )
 ha_const.CONF_NAME = "name"
 ha_const.EntityCategory = types.SimpleNamespace(
@@ -413,6 +415,20 @@ class MockSwitchEntity(MockEntity):
 
 switch_module.SwitchEntity = MockSwitchEntity
 switch_module.SwitchEntityDescription = MockEntityDescription
+
+# Notify module
+notify_module = sys.modules["homeassistant.components.notify"]
+
+
+class MockNotifyEntity(MockEntity):
+    async def async_send_message(self, message: str, title: str | None = None) -> None:
+        pass
+
+
+notify_module.NotifyEntity = MockNotifyEntity
+notify_module.NotifyEntityFeature = types.SimpleNamespace(
+    TITLE=1,
+)
 
 # Diagnostics module
 diag_module = sys.modules["homeassistant.components.diagnostics"]

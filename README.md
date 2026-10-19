@@ -13,6 +13,15 @@ Home Assistant custom integration for **Hermes Agent** (Nous Research). Seamless
 
 ---
 
+## 🧭 Quick Links
+
+| | | | |
+| :--- | :--- | :--- | :--- |
+| [✨ Features](#-key-features--platforms) | [📦 Installation](#-installation) | [⚙️ Configuration](#️-configuration) | [🛡️ Security](SECURITY.md) |
+| [🧱 Services](#-custom-services) | [📊 Diagnostics](#-diagnostics--troubleshooting) | [🧑‍💻 Development](AGENTS.MD) | [💖 Sponsors](.github/FUNDING.yml) |
+
+---
+
 ## 🌟 Key Features & Platforms
 
 ### 1. 🗣️ Assist Voice & Conversation Agent (`conversation.hermes_agent_*`)
