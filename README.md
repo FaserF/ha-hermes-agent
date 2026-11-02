@@ -1,10 +1,10 @@
-<p align="center">
+﻿<p align="center">
   <img src="https://raw.githubusercontent.com/FaserF/ha-hermes-agent/main/custom_components/hermes_agent/brand/logo.png" alt="Hermes Agent Logo" width="360">
 </p>
 
 # Hermes Agent for Home Assistant
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/default)
+[![Home Assistant Marketplace](https://img.shields.io/badge/Home_Assistant-Marketplace-41BDF5.svg?style=flat-square&logo=homeassistant&logoColor=white)](https://www.home-assistant.io)
 [![CI](https://github.com/FaserF/ha-hermes-agent/actions/workflows/ci-orchestrator.yml/badge.svg)](https://github.com/FaserF/ha-hermes-agent/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Semantic Versioning: SemVer](https://img.shields.io/badge/versioning-SemVer-informational.svg)](https://semver.org)
@@ -140,8 +140,8 @@ pytest tests/ -v
 
 | Device / Service | Integration Use Case | Link |
 | :--- | :--- | :--- |
-| **Home Assistant Green & Offizielle Smart-Home-Hardware** | Empfohlene Hardware-Basis für lokale Home Assistant Integrationen | [Offizielle Geräte-Seite →](https://fabiseitz.de/go/ha-hardware) |
-| **Home Assistant Connect ZBT-1 (Zigbee / Thread)** | Lokales Zigbee2MQTT, ZHA & Matter-over-Thread Funknetz | [Offizielle Geräte-Seite →](https://fabiseitz.de/go/ha-zigbee) |
+| **Home Assistant Green & Official Hardware** | Recommended hardware foundation for local Home Assistant integrations | [Official Device Page →](https://fabiseitz.de/go/ha-hardware) |
+| **Home Assistant Connect ZBT-1 (Zigbee / Thread)** | Local Zigbee2MQTT, ZHA & Matter-over-Thread wireless mesh | [Official Device Page →](https://fabiseitz.de/go/ha-zigbee) |
 
 ---
 
