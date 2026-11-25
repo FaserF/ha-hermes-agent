@@ -18,8 +18,6 @@ from homeassistant.core import (
 )
 from homeassistant.exceptions import HomeAssistantError
 
-_LOGGER = logging.getLogger(__name__)
-
 from .client import HermesAgentClient
 from .const import (
     CONF_AI_TASK_MAX_TOKENS,
@@ -57,6 +55,8 @@ from .const import (
     SERVICE_SUGGEST_AUTOMATIONS,
 )
 from .coordinator import HermesAgentDataUpdateCoordinator
+
+_LOGGER = logging.getLogger(__name__)
 
 NOTIFY_SCHEMA = vol.Schema(
     {
