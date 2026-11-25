@@ -122,7 +122,7 @@ class HermesAgentOptionsFlowHandler(config_entries.OptionsFlow):
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         """Initialize options flow."""
-        # config_entry is a read-only property on HA OptionsFlow
+        self._config_entry_fallback = config_entry
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
@@ -131,15 +131,16 @@ class HermesAgentOptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
-        entry_data = self.config_entry.data
-        entry_options = self.config_entry.options
+        config_entry = (
+            getattr(self, "_config_entry_fallback", None) or self.config_entry
+        )
+        entry_data = config_entry.data
+        entry_options = config_entry.options
 
         # Fetch models from coordinator or direct client
         models = [DEFAULT_CHAT_MODEL]
         try:
-            entry_store = self.hass.data.get(DOMAIN, {}).get(
-                self.config_entry.entry_id, {}
-            )
+            entry_store = self.hass.data.get(DOMAIN, {}).get(config_entry.entry_id, {})
             coordinator = entry_store.get("coordinator")
             if coordinator and coordinator.models:
                 models = coordinator.models

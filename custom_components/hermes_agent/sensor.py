@@ -22,6 +22,32 @@ from .const import DATA_COORDINATOR, DATA_SUGGESTIONS_SENSOR, DOMAIN
 from .coordinator import HermesAgentDataUpdateCoordinator
 from .helpers import get_device_info
 
+_MAX_MODELS_ATTR_BYTES = 8192
+
+
+def _format_models_extra(models: Any) -> dict[str, Any]:
+    """Build bounded model list attributes to stay well under HA's 16 KB recorder limit."""
+    if not isinstance(models, list):
+        return {"models": []}
+    bounded: list[str] = []
+    total_bytes = 2
+    truncated = False
+    for model in models:
+        item = str(model)
+        item_bytes = len(item.encode("utf-8")) + 4
+        if total_bytes + item_bytes > _MAX_MODELS_ATTR_BYTES:
+            truncated = True
+            break
+        bounded.append(item)
+        total_bytes += item_bytes
+    result: dict[str, Any] = {
+        "models": bounded,
+        "models_total": len(models),
+    }
+    if truncated:
+        result["models_truncated"] = True
+    return result
+
 
 @dataclass(frozen=True, kw_only=True)
 class HermesAgentSensorEntityDescription(SensorEntityDescription):
@@ -62,7 +88,7 @@ SENSOR_DESCRIPTIONS: tuple[HermesAgentSensorEntityDescription, ...] = (
         icon="mdi:robot",
         state_class=SensorStateClass.TOTAL,
         value_fn=lambda data: data.get("models_count", 0),
-        extra_fn=lambda data: {"models": data.get("models", [])},
+        extra_fn=lambda data: _format_models_extra(data.get("models", [])),
     ),
     HermesAgentSensorEntityDescription(
         key="active_agents",
